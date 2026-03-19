@@ -5,160 +5,163 @@ const { WebSocketServer, WebSocket } = require('ws');
 
 const PORT = process.env.PORT || 3000;
 
-// ── HTTP server (serves the HTML file) ──────────────────────────────
-const httpServer = http.createServer((req, res) => {
-  const filePath = path.join(__dirname, 'public', 'air-hockey.html');
-  fs.readFile(filePath, (err, data) => {
+// ── HTTP ─────────────────────────────────────────────────────────────
+const server = http.createServer((req, res) => {
+  const file = path.join(__dirname, 'public', 'air-hockey.html');
+  fs.readFile(file, (err, data) => {
     if (err) { res.writeHead(404); res.end('Not found'); return; }
-    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(data);
   });
 });
 
-// ── WebSocket server ─────────────────────────────────────────────────
-const wss = new WebSocketServer({ server: httpServer });
+// ── WEBSOCKET ─────────────────────────────────────────────────────────
+const wss = new WebSocketServer({ server });
 
-// rooms: { roomCode: { host: ws, guest: ws | null } }
+// rooms: Map<code, { host: ws, guest: ws|null }>
 const rooms = new Map();
 
 function send(ws, obj) {
-  if (ws && ws.readyState === WebSocket.OPEN) {
+  if (ws && ws.readyState === WebSocket.OPEN)
     ws.send(JSON.stringify(obj));
-  }
 }
 
-wss.on('connection', (ws) => {
-  ws.roomCode = null;
-  ws.role     = null;
+wss.on('connection', ws => {
+  ws._code = null;
+  ws._role = null;
 
-  ws.on('message', (raw) => {
+  ws.on('message', raw => {
     let msg;
     try { msg = JSON.parse(raw); } catch { return; }
 
     switch (msg.type) {
 
-      // ── HOST creates a room ──────────────────────────────────────
+      // ── HOST creates room ──────────────────────────────────────────
       case 'create': {
-        const code = msg.code;
-        if (rooms.has(code)) {
-          send(ws, { type: 'error', text: 'Room already exists' });
+        const code = String(msg.code).trim();
+        if (!code || rooms.has(code)) {
+          send(ws, { type: 'error', text: 'Room already exists or invalid code' });
           return;
         }
         rooms.set(code, { host: ws, guest: null });
-        ws.roomCode = code;
-        ws.role = 'host';
+        ws._code = code;
+        ws._role = 'host';
         send(ws, { type: 'created', code });
-        console.log(`Room created: ${code}`);
+        console.log(`[+] Room ${code} created`);
         break;
       }
 
-      // ── GUEST joins a room ───────────────────────────────────────
+      // ── GUEST joins room ───────────────────────────────────────────
       case 'join': {
-        const code = msg.code;
+        const code = String(msg.code).trim();
         const room = rooms.get(code);
         if (!room) {
-          send(ws, { type: 'error', text: 'Room not found' });
+          send(ws, { type: 'error', text: 'Room not found. Check the code!' });
           return;
         }
         if (room.guest) {
-          send(ws, { type: 'error', text: 'Room is full' });
+          send(ws, { type: 'error', text: 'Room is full!' });
           return;
         }
-        room.guest  = ws;
-        ws.roomCode = code;
-        ws.role     = 'guest';
+        room.guest = ws;
+        ws._code   = code;
+        ws._role   = 'guest';
 
-        const guestName = msg.name || 'Guest';
-        const hostName  = msg.hostName || 'Host';
+        const guestName = String(msg.name || 'Guest').slice(0, 20);
+        const hostName  = String(room.host._name || 'Host').slice(0, 20);
 
-        // Tell guest they joined
-        send(ws, { type: 'joined', code, role: 'guest', opponentName: hostName });
-        // Tell host that guest joined
+        // Tell guest they joined — send host's name as opponent
+        send(ws, { type: 'joined', code, hostName });
+
+        // Tell host guest joined — send guest's name as opponent
         send(room.host, { type: 'opponent_joined', opponentName: guestName });
-        console.log(`Room ${code}: guest joined`);
+
+        // Store name on host socket for future reference
+        ws._name = guestName;
+        console.log(`[+] Room ${code}: ${guestName} joined`);
         break;
       }
 
-      // ── PADDLE position (sent every frame) ──────────────────────
-      case 'paddle': {
-        const room = rooms.get(ws.roomCode);
+      // ── PADDLE position (relayed to opponent) ──────────────────────
+      // Both host and guest send 'my_paddle' with normalised x,y (0..1)
+      // Server relays it to the other player as 'opponent_paddle'
+      case 'my_paddle': {
+        const room = rooms.get(ws._code);
         if (!room) return;
-        // Forward to opponent
-        const opponent = ws.role === 'host' ? room.guest : room.host;
-        send(opponent, { type: 'paddle', x: msg.x, y: msg.y });
+        const opponent = ws._role === 'host' ? room.guest : room.host;
+        send(opponent, { type: 'opponent_paddle', x: msg.x, y: msg.y });
         break;
       }
 
-      // ── PUCK state (host is authoritative) ──────────────────────
-      case 'puck': {
-        const room = rooms.get(ws.roomCode);
-        if (!room || ws.role !== 'host') return;
+      // ── PUCK state (host → guest) ──────────────────────────────────
+      case 'puck_state': {
+        const room = rooms.get(ws._code);
+        if (!room || ws._role !== 'host') return;
+        send(room.guest, { type: 'puck_state', px: msg.px, py: msg.py, vx: msg.vx, vy: msg.vy });
+        break;
+      }
+
+      // ── GOAL (host → guest) ────────────────────────────────────────
+      case 'goal': {
+        const room = rooms.get(ws._code);
+        if (!room || ws._role !== 'host') return;
         send(room.guest, {
-          type: 'puck',
-          x: msg.x, y: msg.y,
-          vx: msg.vx, vy: msg.vy
+          type: 'goal',
+          scorer_is_guest: msg.scorer_is_guest,
+          s_guest: msg.s_guest,
+          s_host:  msg.s_host,
+          game_over: msg.game_over
         });
         break;
       }
 
-      // ── GOAL scored ─────────────────────────────────────────────
-      case 'goal': {
-        const room = rooms.get(ws.roomCode);
-        if (!room || ws.role !== 'host') return;
-        send(room.guest, { type: 'goal', scorer: msg.scorer, s1: msg.s1, s2: msg.s2 });
+      // ── GAME OVER (host → guest) ───────────────────────────────────
+      case 'game_over': {
+        const room = rooms.get(ws._code);
+        if (!room || ws._role !== 'host') return;
+        send(room.guest, { type: 'game_over', s_guest: msg.s_guest, s_host: msg.s_host });
         break;
       }
 
-      // ── GAME OVER ───────────────────────────────────────────────
-      case 'gameover': {
-        const room = rooms.get(ws.roomCode);
-        if (!room || ws.role !== 'host') return;
-        send(room.guest, { type: 'gameover', s1: msg.s1, s2: msg.s2 });
-        break;
-      }
-
-      // ── RESTART request ─────────────────────────────────────────
+      // ── RESTART ────────────────────────────────────────────────────
       case 'restart': {
-        const room = rooms.get(ws.roomCode);
+        const room = rooms.get(ws._code);
         if (!room) return;
-        const opponent = ws.role === 'host' ? room.guest : room.host;
-        send(opponent, { type: 'restart_request', from: ws.role });
+        // Tell both players to restart
+        send(room.host,  { type: 'restart_ok' });
+        send(room.guest, { type: 'restart_ok' });
         break;
       }
 
-      case 'restart_ok': {
-        const room = rooms.get(ws.roomCode);
-        if (!room) return;
-        send(room.host, { type: 'restart_go' });
-        send(room.guest, { type: 'restart_go' });
-        break;
-      }
-
-      // ── PING / PONG (keep-alive) ─────────────────────────────────
+      // ── KEEP-ALIVE ─────────────────────────────────────────────────
       case 'ping':
         send(ws, { type: 'pong' });
         break;
     }
   });
 
+  // Store name when creating
+  ws.on('message', raw => {
+    try {
+      const msg = JSON.parse(raw);
+      if (msg.type === 'create' && msg.name) ws._name = String(msg.name).slice(0, 20);
+    } catch {}
+  });
+
   ws.on('close', () => {
-    const code = ws.roomCode;
+    const code = ws._code;
     if (!code) return;
     const room = rooms.get(code);
     if (!room) return;
-
-    // Notify opponent that player left
-    const opponent = ws.role === 'host' ? room.guest : room.host;
+    const opponent = ws._role === 'host' ? room.guest : room.host;
     send(opponent, { type: 'opponent_left' });
-
-    // Clean up room
     rooms.delete(code);
-    console.log(`Room ${code} closed`);
+    console.log(`[-] Room ${code} closed`);
   });
 
   ws.on('error', () => {});
 });
 
-httpServer.listen(PORT, () => {
-  console.log(`✅ Air Hockey server running on port ${PORT}`);
+server.listen(PORT, () => {
+  console.log(`✅  Air Hockey server on port ${PORT}`);
 });
