@@ -3,422 +3,315 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>AIR SMASH 🏒</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@400;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+<title>AIR SMASH</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
 <style>
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; }
-:root {
-  --red:#FF4757; --blue:#2979FF; --yellow:#FFD600; --green:#00E676;
-  --orange:#FF6D00; --pink:#F06292; --bg:#FFF8F0;
+/* ─── RESET ─── */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;}
+:root{
+  --p1:#FF4757; --p1d:#c0392b;
+  --p2:#2979FF; --p2d:#1565c0;
+  --green:#00C853; --greend:#009624;
+  --yellow:#FFD600;
+  --bg:#F0F4FF;
+  --card:#ffffff;
+  --text:#1a1a2e;
+  --sub:#94a3b8;
 }
-body { font-family:'Poppins',sans-serif; background:var(--bg); min-height:100dvh; overflow:hidden; }
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);}
 
-.blob { position:fixed; border-radius:50%; z-index:0; pointer-events:none; animation:blobPulse 6s ease-in-out infinite; }
-.b1{width:500px;height:500px;background:#FFE0E8;top:-200px;left:-150px;opacity:.7;}
-.b2{width:400px;height:400px;background:#DBEAFE;bottom:-150px;right:-120px;opacity:.7;animation-delay:2s;}
-.b3{width:250px;height:250px;background:#FEF9C3;top:35%;right:-80px;opacity:.6;animation-delay:4s;}
-.b4{width:200px;height:200px;background:#D1FAE5;bottom:25%;left:-60px;opacity:.6;animation-delay:1s;}
-@keyframes blobPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+/* ─── LOADING ─── */
+#loading{
+  position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;
+  transition:opacity .6s ease;
+}
+#loading.out{opacity:0;pointer-events:none;}
+.ld-puck{
+  width:80px;height:80px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#555,#111);
+  box-shadow:0 12px 0 rgba(0,0,0,.3),0 16px 40px rgba(0,0,0,.4);
+  animation:ldBounce .65s cubic-bezier(.36,.07,.19,.97) infinite alternate;
+}
+@keyframes ldBounce{from{transform:translateY(0);}to{transform:translateY(-36px);}}
+.ld-shadow{
+  width:60px;height:12px;border-radius:50%;
+  background:rgba(0,0,0,.25);margin-top:-16px;
+  animation:ldShadow .65s ease-in-out infinite alternate;
+}
+@keyframes ldShadow{from{transform:scaleX(1);}to{transform:scaleX(.5);opacity:.4;}}
+.ld-title{font-family:'Fredoka One',cursive;font-size:42px;color:#fff;letter-spacing:2px;}
+.ld-bar{width:200px;height:5px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden;}
+.ld-fill{height:100%;background:#fff;border-radius:99px;animation:ldFill 1.3s ease-out forwards;}
+@keyframes ldFill{from{width:0}to{width:100%}}
 
-.screen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;transition:opacity .3s,transform .3s;}
-.screen.off{opacity:0;pointer-events:none;transform:scale(.97);}
+/* ─── SCREENS ─── */
+.screen{
+  position:fixed;inset:0;z-index:10;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:20px;gap:16px;
+  transition:opacity .28s ease,transform .28s ease;
+}
+.screen.hidden{opacity:0;pointer-events:none;transform:scale(.97);}
 
-/* ─── LOBBY ─── */
-.logo{text-align:center;margin-bottom:22px;animation:popIn .6s cubic-bezier(.34,1.56,.64,1);}
-@keyframes popIn{from{opacity:0;transform:translateY(-28px) scale(.85)}to{opacity:1;transform:none}}
-.logo-icon{font-size:64px;display:block;animation:spinPuck 3s linear infinite;}
-@keyframes spinPuck{to{transform:rotate(360deg)}}
-.logo-title{font-family:'Fredoka One',cursive;font-size:clamp(52px,12vw,90px);line-height:1;color:#1a1a2e;display:block;}
-.logo-title .r{color:var(--red)}.logo-title .b{color:var(--blue)}.logo-title .y{color:var(--yellow)}.logo-title .g{color:var(--green)}
-.logo-sub{font-size:13px;font-weight:700;letter-spacing:4px;color:#bbb;text-transform:uppercase;margin-top:3px;}
+/* ─── BG DECOR ─── */
+.bg-circle{position:fixed;border-radius:50%;pointer-events:none;z-index:0;}
+.bc1{width:480px;height:480px;background:rgba(255,71,87,.12);top:-160px;left:-120px;}
+.bc2{width:380px;height:380px;background:rgba(41,121,255,.1);bottom:-120px;right:-100px;}
+.bc3{width:220px;height:220px;background:rgba(255,214,0,.12);top:30%;right:-60px;}
 
-.card{background:#fff;border-radius:24px;padding:26px;box-shadow:0 8px 32px rgba(0,0,0,.1);width:100%;max-width:400px;animation:slideUp .5s cubic-bezier(.34,1.56,.64,1) .1s both;}
-@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+/* ─── SHARED COMPONENTS ─── */
+.logo-wrap{text-align:center;z-index:1;}
+.logo-icon{font-size:60px;display:block;animation:spin 4s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.logo-text{
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(48px,11vw,86px);
+  line-height:1;display:block;
+  background:linear-gradient(135deg,var(--p1) 0%,#FF8C00 40%,var(--p2) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.logo-sub{font-size:12px;font-weight:800;letter-spacing:4px;color:var(--sub);text-transform:uppercase;margin-top:4px;}
 
-.lbl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#bbb;margin-bottom:7px;display:block;}
-.name-inp{width:100%;border:2.5px solid #eee;border-radius:14px;padding:13px 16px;font-size:18px;font-family:'Poppins',sans-serif;font-weight:700;color:#1a1a2e;outline:none;transition:border-color .2s;margin-bottom:20px;}
-.name-inp:focus{border-color:var(--blue);}
+.card{
+  background:var(--card);border-radius:24px;padding:24px;
+  box-shadow:0 4px 6px rgba(0,0,0,.04),0 12px 40px rgba(0,0,0,.1);
+  width:100%;max-width:420px;z-index:1;
+}
 
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.bigbtn{border:none;cursor:pointer;border-radius:18px;font-family:'Fredoka One',cursive;font-size:20px;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden;}
-.bigbtn:hover{transform:translateY(-4px);}
-.bigbtn:active{transform:scale(.96);}
-.bigbtn .ico{font-size:30px;}
-.bigbtn .sub{font-size:11px;font-family:'Poppins',sans-serif;font-weight:600;opacity:.75;}
-.btn-create{background:var(--red);color:#fff;box-shadow:0 5px 0 #c0392b,0 8px 20px rgba(255,71,87,.3);}
-.btn-create:hover{box-shadow:0 7px 0 #c0392b,0 12px 28px rgba(255,71,87,.35);}
-.btn-join-l{background:var(--blue);color:#fff;box-shadow:0 5px 0 #1565c0,0 8px 20px rgba(41,121,255,.3);}
-.btn-join-l:hover{box-shadow:0 7px 0 #1565c0,0 12px 28px rgba(41,121,255,.35);}
+.field-label{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--sub);margin-bottom:8px;display:block;}
+.text-inp{
+  width:100%;border:2.5px solid #E8EDF5;border-radius:14px;
+  padding:13px 16px;font-size:17px;font-family:'Nunito',sans-serif;font-weight:700;
+  color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;
+  background:#FAFBFF;
+}
+.text-inp:focus{border-color:var(--p2);box-shadow:0 0 0 4px rgba(41,121,255,.12);}
 
-/* ─── MODES ─── */
-#sModes{gap:18px;}
-.section-h{font-family:'Fredoka One',cursive;font-size:clamp(26px,5vw,40px);text-align:center;color:#1a1a2e;}
-.mode-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;width:100%;max-width:460px;}
-.mcard{flex:1;min-width:170px;background:#fff;border-radius:22px;padding:28px 16px;text-align:center;cursor:pointer;box-shadow:0 6px 0 #ddd,0 10px 28px rgba(0,0,0,.08);border:3px solid transparent;transition:transform .18s,border-color .18s,box-shadow .18s;}
-.mcard:hover{transform:translateY(-6px);}
-.mcard.ai:hover{border-color:var(--orange);box-shadow:0 6px 0 #e65100,0 12px 36px rgba(255,109,0,.25);}
-.mcard.priv:hover{border-color:var(--blue);box-shadow:0 6px 0 #1565c0,0 12px 36px rgba(41,121,255,.25);}
-.mcard-icon{font-size:48px;display:block;margin-bottom:10px;}
-.mcard-title{font-family:'Fredoka One',cursive;font-size:26px;color:#1a1a2e;}
-.mcard-desc{font-size:12px;color:#aaa;margin-top:4px;line-height:1.4;}
+.btn{
+  border:none;cursor:pointer;border-radius:16px;font-family:'Fredoka One',cursive;
+  font-size:20px;padding:16px 20px;width:100%;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:transform .14s,box-shadow .14s;position:relative;overflow:hidden;
+}
+.btn:hover{transform:translateY(-3px);}
+.btn:active{transform:scale(.97);}
+.btn-red{background:var(--p1);color:#fff;box-shadow:0 5px 0 var(--p1d),0 8px 24px rgba(255,71,87,.3);}
+.btn-red:hover{box-shadow:0 7px 0 var(--p1d),0 12px 28px rgba(255,71,87,.35);}
+.btn-blue{background:var(--p2);color:#fff;box-shadow:0 5px 0 var(--p2d),0 8px 24px rgba(41,121,255,.3);}
+.btn-blue:hover{box-shadow:0 7px 0 var(--p2d),0 12px 28px rgba(41,121,255,.35);}
+.btn-green{background:var(--green);color:#fff;box-shadow:0 5px 0 var(--greend),0 8px 24px rgba(0,200,83,.3);}
+.btn-green:hover{box-shadow:0 7px 0 var(--greend),0 12px 28px rgba(0,200,83,.35);}
+.btn-ghost{background:#F0F4FF;color:var(--text);box-shadow:0 4px 0 #dde3f0;}
+.btn-ghost:hover{box-shadow:0 6px 0 #dde3f0;}
 
-/* ─── WAIT ─── */
-#sWait{gap:16px;}
-.code-card{background:#fff;border-radius:24px;padding:30px 28px 22px;box-shadow:0 8px 28px rgba(0,0,0,.1);text-align:center;width:100%;max-width:380px;}
-.code-num{font-family:'Fredoka One',cursive;font-size:74px;letter-spacing:12px;color:#1a1a2e;cursor:pointer;display:inline-block;transition:transform .1s;}
-.code-num:active{transform:scale(.93);}
-.copy-hint{font-size:12px;color:var(--blue);font-weight:700;cursor:pointer;margin-top:3px;}
-.dots{display:flex;gap:10px;justify-content:center;}
-.dot{width:13px;height:13px;border-radius:50%;animation:dotBounce 1.1s ease-in-out infinite;}
-.d1{background:var(--red);animation-delay:0s}
-.d2{background:var(--yellow);animation-delay:.18s}
-.d3{background:var(--green);animation-delay:.36s}
-.d4{background:var(--blue);animation-delay:.54s}
-@keyframes dotBounce{0%,80%,100%{transform:scale(.45)}40%{transform:scale(1.25)}}
-.wait-txt{font-size:14px;font-weight:600;color:#aaa;}
-
-/* ─── JOIN ─── */
-#sJoin{gap:16px;}
-.code-inp{font-family:'Fredoka One',cursive;font-size:52px;text-align:center;letter-spacing:10px;width:100%;max-width:320px;border:3px solid #eee;border-radius:20px;padding:16px 10px;outline:none;color:#1a1a2e;transition:border-color .2s;background:#fff;}
-.code-inp:focus{border-color:var(--blue);}
-.go-btn{background:var(--green);color:#fff;border:none;border-radius:18px;font-family:'Fredoka One',cursive;font-size:26px;padding:15px 52px;cursor:pointer;box-shadow:0 5px 0 #00a152,0 8px 20px rgba(0,230,118,.3);transition:transform .15s,box-shadow .15s;}
-.go-btn:hover{transform:translateY(-4px);box-shadow:0 7px 0 #00a152,0 12px 28px rgba(0,230,118,.35);}
-.go-btn:active{transform:scale(.96);}
-
-.back-btn{position:absolute;top:18px;left:18px;background:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;transition:transform .15s;z-index:20;}
+.back-btn{
+  position:absolute;top:16px;left:16px;z-index:20;
+  background:#fff;border:none;border-radius:50%;width:42px;height:42px;
+  font-size:18px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.1);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .14s;
+}
 .back-btn:hover{transform:scale(1.1);}
 
-/* ══ GAME ══ */
-#sGame{padding:0;background:#fff;justify-content:flex-start;}
-
-.sbar{
-  display:grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items:center;
-  padding:6px 10px;
-  border-bottom:3px solid #F3F4F6;
-  flex-shrink:0; background:#fff; gap:4px;
+/* ─── MODE CARDS ─── */
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:440px;z-index:1;}
+.mcard{
+  background:#fff;border-radius:22px;padding:24px 14px;text-align:center;
+  cursor:pointer;box-shadow:0 5px 0 #dde3f0,0 10px 28px rgba(0,0,0,.08);
+  border:3px solid transparent;transition:transform .16s,border-color .16s,box-shadow .16s;
 }
-.sbar-left{ display:flex; flex-direction:column; align-items:center; }
-.sbar-center{ display:flex; flex-direction:column; align-items:center; padding:0 6px; }
-/* Right side: p2 score + by + action buttons all in one row */
-.sbar-right-group{
-  display:flex; align-items:center; justify-content:flex-end; gap:6px;
+.mcard:hover{transform:translateY(-6px);}
+.mcard.ai:hover{border-color:#FF8C00;box-shadow:0 5px 0 #e07800,0 12px 36px rgba(255,140,0,.2);}
+.mcard.pvp:hover{border-color:var(--p2);box-shadow:0 5px 0 var(--p2d),0 12px 36px rgba(41,121,255,.2);}
+.mcard-icon{font-size:44px;display:block;margin-bottom:8px;}
+.mcard-name{font-family:'Fredoka One',cursive;font-size:24px;color:var(--text);}
+.mcard-info{font-size:11px;color:var(--sub);margin-top:3px;line-height:1.4;}
+
+/* ─── WAIT SCREEN ─── */
+.code-box{
+  background:#fff;border-radius:22px;padding:28px 24px 20px;
+  box-shadow:0 4px 6px rgba(0,0,0,.04),0 12px 40px rgba(0,0,0,.1);
+  text-align:center;width:100%;max-width:380px;z-index:1;
 }
-.sbar-right{ display:flex; flex-direction:column; align-items:center; }
-.sbar-actions{display:flex;gap:5px;align-items:center;flex-shrink:0;}
-
-.ptag{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;padding:2px 8px;border-radius:50px;color:#fff;margin-bottom:1px;}
-.ptag1{background:var(--red);}
-.ptag2{background:var(--blue);}
-.pname{font-size:11px;font-weight:700;color:#aaa;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;}
-.pscore{font-family:'Fredoka One',cursive;font-size:44px;line-height:1;}
-.sc1{color:var(--red);}
-.sc2{color:var(--blue);}
-.pscore.pop{animation:scorePop .35s cubic-bezier(.34,1.56,.64,1);}
-@keyframes scorePop{0%{transform:scale(1)}50%{transform:scale(1.45)}100%{transform:scale(1)}}
-
-.timer-block{text-align:center;}
-.timer-num{font-family:'Fredoka One',cursive;font-size:26px;color:#1a1a2e;line-height:1;}
-.timer-num.urgent{color:var(--red);animation:urgentPulse .5s ease-in-out infinite;}
-@keyframes urgentPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
-.vs-lbl{font-size:9px;font-weight:700;letter-spacing:2px;color:#ccc;text-transform:uppercase;}
-
-.icon-btn{
-  background:#F3F4F6; border:none; border-radius:10px;
-  width:36px; height:36px; font-size:16px; cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-  transition:background .15s, transform .15s; flex-shrink:0;
+.code-digits{
+  font-family:'Fredoka One',cursive;font-size:76px;letter-spacing:14px;
+  color:var(--text);cursor:pointer;display:inline-block;
+  transition:transform .1s;
 }
-.icon-btn:hover{background:#E5E7EB; transform:scale(1.08);}
-.icon-btn:active{transform:scale(.93);}
-.icon-btn.leave{background:#FEE2E2; color:var(--red);}
-.icon-btn.leave:hover{background:#FECACA;}
-.icon-btn.fs{background:#EDE9FE; color:#7C3AED;}
-.icon-btn.fs:hover{background:#DDD6FE;}
+.code-digits:active{transform:scale(.94);}
+.code-copy{font-size:12px;color:var(--p2);font-weight:800;cursor:pointer;margin-top:2px;}
+.wait-dots{display:flex;gap:10px;justify-content:center;z-index:1;}
+.wd{width:12px;height:12px;border-radius:50%;animation:wdBounce 1s ease-in-out infinite;}
+.wd:nth-child(1){background:var(--p1);animation-delay:0s;}
+.wd:nth-child(2){background:var(--yellow);animation-delay:.15s;}
+.wd:nth-child(3){background:var(--green);animation-delay:.3s;}
+.wd:nth-child(4){background:var(--p2);animation-delay:.45s;}
+@keyframes wdBounce{0%,80%,100%{transform:scale(.5)}40%{transform:scale(1.3)}}
+.wait-status{font-size:14px;font-weight:700;color:var(--sub);z-index:1;}
 
-/* pointer lock crosshair hint */
-.click-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  font-family:'Fredoka One',cursive;font-size:18px;color:rgba(0,0,0,.3);
-  pointer-events:none;z-index:2;text-align:center;line-height:1.5;
-  transition:opacity .4s;}
-.click-hint.gone{opacity:0;}
-
-.canvas-wrap{flex:1;position:relative;overflow:hidden;}
-canvas{display:block;width:100%;height:100%;touch-action:none;cursor:none;}
-
-.gflash{position:absolute;inset:0;pointer-events:none;opacity:0;z-index:3;transition:opacity .08s;}
-
-.goal-pop{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-family:'Fredoka One',cursive;font-size:clamp(48px,9vw,80px);pointer-events:none;z-index:8;transition:transform .25s cubic-bezier(.34,1.56,.64,1),opacity .25s;text-align:center;line-height:1.1;}
-.goal-pop.show{transform:translate(-50%,-50%) scale(1);}
-.goal-pop.hide{opacity:0;transform:translate(-50%,-60%) scale(.8);}
-
-.overlay{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);}
-.overlay.hidden{display:none;}
-.ov-emoji{font-size:76px;animation:popIn .4s cubic-bezier(.34,1.56,.64,1);}
-.ov-title{font-family:'Fredoka One',cursive;font-size:clamp(34px,8vw,62px);margin:8px 0 4px;color:#1a1a2e;}
-.ov-sub{font-size:15px;font-weight:600;color:#aaa;margin-bottom:26px;}
-.ov-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
-.ov-btn{border:none;border-radius:16px;font-family:'Fredoka One',cursive;font-size:22px;padding:14px 28px;cursor:pointer;transition:transform .15s;}
-.ov-btn:hover{transform:translateY(-3px);}
-.ov-btn:active{transform:scale(.96);}
-.btn-again{background:var(--green);color:#fff;box-shadow:0 4px 0 #00a152;}
-.btn-lobby{background:#F3F4F6;color:#555;box-shadow:0 4px 0 #ddd;}
-
-.cp{position:fixed;top:-10px;width:10px;height:10px;border-radius:2px;animation:fall linear forwards;pointer-events:none;z-index:200;}
-@keyframes fall{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:0}}
-
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a2e;color:#fff;padding:11px 22px;border-radius:50px;font-size:14px;font-weight:700;z-index:300;transition:transform .3s;white-space:nowrap;}
-.toast.show{transform:translateX(-50%) translateY(0);}
-
-@media(max-width:400px){
-  .mcard{min-width:140px;}
-  .bigbtn{font-size:18px;}
+/* ─── JOIN SCREEN ─── */
+.code-input{
+  font-family:'Fredoka One',cursive;font-size:56px;text-align:center;letter-spacing:12px;
+  width:100%;max-width:300px;border:3px solid #E8EDF5;border-radius:20px;
+  padding:16px 10px;outline:none;color:var(--text);
+  transition:border-color .2s,box-shadow .2s;background:#fff;z-index:1;
 }
+.code-input:focus{border-color:var(--p2);box-shadow:0 0 0 4px rgba(41,121,255,.12);}
 
 /* ─── BY MUSOKHAN BADGE ─── */
-.by-musokhan-wrap {
-  position: fixed;
-  top: 14px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 999;
-  animation: badgeEntrance .8s cubic-bezier(.34,1.56,.64,1) .3s both;
+#byBadge{
+  position:fixed;top:14px;left:50%;transform:translateX(-50%);
+  z-index:500;animation:badgeIn .8s cubic-bezier(.34,1.56,.64,1) .4s both;
 }
-@keyframes badgeEntrance {
-  from { opacity:0; transform: translateX(-50%) translateY(-24px) scale(.85); }
-  to   { opacity:1; transform: translateX(-50%) translateY(0) scale(1); }
+@keyframes badgeIn{from{opacity:0;transform:translateX(-50%) translateY(-20px) scale(.85);}to{opacity:1;transform:translateX(-50%) translateY(0) scale(1);}}
+#byBadge a{
+  display:flex;align-items:center;gap:9px;padding:7px 18px 7px 14px;
+  background:rgba(255,255,255,.9);backdrop-filter:blur(12px);
+  border-radius:50px;text-decoration:none;white-space:nowrap;
+  border:1.5px solid rgba(14,165,233,.2);
+  box-shadow:0 4px 20px rgba(14,165,233,.15);
+  transition:transform .18s,box-shadow .18s;
 }
+#byBadge a:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(14,165,233,.25);}
+.by-dot{width:9px;height:9px;border-radius:50%;background:#0ea5e9;flex-shrink:0;animation:byDot 2s ease-in-out infinite;}
+@keyframes byDot{0%,100%{background:#0ea5e9;box-shadow:0 0 0 0 rgba(14,165,233,.5);}50%{background:#10b981;box-shadow:0 0 0 6px rgba(14,165,233,0);}}
+.by-inner{display:flex;flex-direction:column;align-items:flex-start;line-height:1;}
+.by-label{font-size:9px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#94a3b8;}
+.by-name{
+  font-family:'Pacifico',cursive;font-size:clamp(15px,3.5vw,20px);
+  background:linear-gradient(90deg,#0ea5e9,#06b6d4,#10b981,#3b82f6,#0ea5e9);
+  background-size:250% 100%;animation:byShift 4s linear infinite;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+@keyframes byShift{0%{background-position:0%}100%{background-position:250%}}
 
-.glow-ring {
-  position: absolute;
-  inset: -5px;
-  border-radius: 50px;
-  background: linear-gradient(90deg,
-    #0ea5e9, #06b6d4, #10b981,
-    #3b82f6, #1e40af, #0ea5e9
-  );
-  background-size: 300% 100%;
-  animation: coolShift 4s linear infinite;
-  z-index: -1;
-  opacity: 0.5;
-  filter: blur(7px);
-}
-@keyframes coolShift {
-  0%   { background-position: 0% 50%; }
-  100% { background-position: 300% 50%; }
-}
+/* ─── GAME SCREEN ─── */
+#sGame{padding:0;background:#F8FAFF;justify-content:flex-start;align-items:stretch;}
 
-.by-musokhan {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 7px 20px 7px 16px;
-  border-radius: 50px;
-  background: rgba(255,255,255,0.92);
-  backdrop-filter: blur(14px);
-  box-shadow: 0 4px 24px rgba(14,165,233,.18), 0 1px 0 rgba(255,255,255,.9) inset;
-  cursor: pointer;
-  text-decoration: none;
-  transition: transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .2s;
-  white-space: nowrap;
-  border: 1.5px solid rgba(14,165,233,0.18);
+/* HUD bar */
+.hud{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 12px;background:#fff;
+  border-bottom:2.5px solid #EEF2FF;flex-shrink:0;
+  box-shadow:0 2px 8px rgba(0,0,0,.05);
 }
-.by-musokhan:hover {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 8px 32px rgba(14,165,233,.28), 0 1px 0 rgba(255,255,255,.9) inset;
-}
-.by-musokhan:active { transform: scale(.97); }
+.hud-player{display:flex;flex-direction:column;align-items:center;min-width:80px;}
+.hud-tag{font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase;padding:2px 10px;border-radius:50px;color:#fff;margin-bottom:1px;}
+.hud-tag.t1{background:var(--p1);}
+.hud-tag.t2{background:var(--p2);}
+.hud-name{font-size:11px;font-weight:700;color:var(--sub);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hud-score{font-family:'Fredoka One',cursive;font-size:46px;line-height:1;}
+.hud-score.s1{color:var(--p1);}
+.hud-score.s2{color:var(--p2);}
+.hud-score.bump{animation:scoreBump .3s cubic-bezier(.34,1.56,.64,1);}
+@keyframes scoreBump{0%{transform:scale(1)}50%{transform:scale(1.5)}100%{transform:scale(1)}}
 
-/* Dot pulse left */
-.by-dot {
-  width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
-  background: #0ea5e9;
-  animation: dotPulse 2s ease-in-out infinite;
-  box-shadow: 0 0 0 0 rgba(14,165,233,.6);
-}
-@keyframes dotPulse {
-  0%   { box-shadow: 0 0 0 0 rgba(14,165,233,.6); background:#0ea5e9; }
-  40%  { box-shadow: 0 0 0 6px rgba(14,165,233,0); background:#10b981; }
-  70%  { box-shadow: 0 0 0 0 rgba(16,185,129,0);  background:#3b82f6; }
-  100% { box-shadow: 0 0 0 0 rgba(14,165,233,.6); background:#0ea5e9; }
-}
+.hud-center{display:flex;flex-direction:column;align-items:center;gap:1px;}
+.hud-time{font-family:'Fredoka One',cursive;font-size:28px;color:var(--text);}
+.hud-time.red{color:var(--p1);animation:timePulse .5s ease-in-out infinite;}
+@keyframes timePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.hud-vs{font-size:9px;font-weight:800;letter-spacing:2px;color:#cbd5e1;text-transform:uppercase;}
 
-.by-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0;
-  line-height: 1;
+.hud-actions{display:flex;gap:6px;}
+.hud-btn{
+  width:34px;height:34px;border:none;border-radius:10px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+  transition:transform .14s,background .14s;flex-shrink:0;
 }
+.hud-btn:hover{transform:scale(1.1);}
+.hud-btn:active{transform:scale(.93);}
+.hud-btn.fs{background:#EDE9FE;color:#7C3AED;}
+.hud-btn.leave{background:#FEE2E2;color:var(--p1);}
 
-.by-label {
-  font-family: 'Poppins', sans-serif;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  color: #94a3b8;
-  margin-bottom: 1px;
-}
+/* CANVAS */
+.canvas-wrap{flex:1;position:relative;overflow:hidden;}
+#gc{display:block;width:100%;height:100%;touch-action:none;cursor:none;}
 
-.by-name {
-  font-family: 'Pacifico', cursive;
-  font-size: clamp(16px, 3.5vw, 22px);
-  background: linear-gradient(
-    90deg,
-    #0ea5e9 0%,
-    #06b6d4 20%,
-    #10b981 40%,
-    #3b82f6 60%,
-    #1e40af 80%,
-    #0ea5e9 100%
-  );
-  background-size: 250% 100%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: coolShift 4s linear infinite;
-  display: block;
-  letter-spacing: 0.5px;
+/* OVERLAYS */
+.overlay{
+  position:absolute;inset:0;z-index:20;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(240,244,255,.94);backdrop-filter:blur(10px);gap:8px;
 }
+.overlay.hidden{display:none;}
+.ov-emoji{font-size:72px;animation:spin .8s cubic-bezier(.34,1.56,.64,1);}
+.ov-title{font-family:'Fredoka One',cursive;font-size:clamp(32px,7vw,58px);color:var(--text);}
+.ov-sub{font-size:14px;font-weight:700;color:var(--sub);margin-bottom:16px;}
+.ov-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.ov-btn{
+  border:none;border-radius:14px;font-family:'Fredoka One',cursive;font-size:20px;
+  padding:13px 26px;cursor:pointer;transition:transform .14s;
+}
+.ov-btn:hover{transform:translateY(-3px);}
+.ov-btn:active{transform:scale(.96);}
+.ov-btn.again{background:var(--green);color:#fff;box-shadow:0 4px 0 var(--greend);}
+.ov-btn.lobby{background:#EEF2FF;color:var(--text);box-shadow:0 4px 0 #dde3f0;}
 
-/* ─── IN-GAME BY MUSOKHAN (sbar) ─── */
-.sbar-by {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
-  padding: 2px 8px;
-  border-radius: 10px;
-  transition: transform .15s;
-  flex-shrink: 0;
-  line-height: 1;
+/* goal flash */
+.goal-flash{position:absolute;inset:0;pointer-events:none;z-index:5;opacity:0;transition:opacity .08s;}
+/* goal popup */
+.goal-pop{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  font-family:'Fredoka One',cursive;font-size:clamp(44px,9vw,78px);
+  pointer-events:none;z-index:10;
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1),opacity .22s;
+  text-align:center;line-height:1.1;
 }
-.sbar-by:hover { transform: scale(1.07); }
-.sbar-by .sb-label {
-  font-size: 8px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: #94a3b8;
-}
-.sbar-by .sb-name {
-  font-family: 'Pacifico', cursive;
-  font-size: 13px;
-  background: linear-gradient(90deg, #0ea5e9 0%, #06b6d4 30%, #10b981 55%, #3b82f6 80%, #0ea5e9 100%);
-  background-size: 250% 100%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: coolShift 4s linear infinite;
-}
+.goal-pop.show{transform:translate(-50%,-50%) scale(1);}
+.goal-pop.gone{opacity:0;transform:translate(-50%,-60%) scale(.8);}
 
-/* ══ LOADING SCREEN ══ */
-#loader {
-  position: fixed; inset: 0; z-index: 9999;
-  background: #FFF8F0;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 20px;
-  transition: opacity .5s, transform .5s;
+/* click hint */
+.click-hint{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-size:15px;font-weight:700;color:rgba(0,0,0,.25);
+  pointer-events:none;z-index:3;text-align:center;line-height:1.8;
+  transition:opacity .4s;
 }
-#loader.fade-out { opacity: 0; transform: scale(1.04); pointer-events: none; }
+.click-hint.gone{opacity:0;}
 
-.loader-puck {
-  width: 72px; height: 72px; border-radius: 50%;
-  background: linear-gradient(135deg, #1a1a2e 60%, #444);
-  box-shadow: 0 8px 0 rgba(0,0,0,.18), 0 12px 30px rgba(0,0,0,.15);
-  position: relative;
-  animation: puckBounce 0.7s cubic-bezier(.36,.07,.19,.97) infinite alternate;
-}
-.loader-puck::after {
-  content: '';
-  position: absolute; inset: 10px;
-  border-radius: 50%;
-  border: 3px solid rgba(255,255,255,.15);
-}
-@keyframes puckBounce {
-  from { transform: translateY(0) scaleX(1); }
-  to   { transform: translateY(-28px) scaleX(.95); }
-}
-.loader-shadow {
-  width: 56px; height: 10px;
-  border-radius: 50%;
-  background: rgba(0,0,0,.12);
-  animation: shadowPulse .7s ease-in-out infinite alternate;
-  margin-top: -14px;
-}
-@keyframes shadowPulse {
-  from { transform: scaleX(1); opacity:.5; }
-  to   { transform: scaleX(.6); opacity:.2; }
-}
-.loader-title {
-  font-family: 'Fredoka One', cursive;
-  font-size: 36px;
-  color: #1a1a2e;
-}
-.loader-title .r{color:var(--red)}.loader-title .b{color:var(--blue)}
-.loader-title .y{color:var(--yellow)}.loader-title .g{color:var(--green)}
-.loader-bar-wrap {
-  width: 160px; height: 6px;
-  background: #F3F4F6; border-radius: 50px; overflow: hidden;
-}
-.loader-bar {
-  height: 100%; border-radius: 50px;
-  background: linear-gradient(90deg, var(--red), var(--blue), var(--green));
-  background-size: 200% 100%;
-  animation: barFill 1.4s cubic-bezier(.4,0,.2,1) forwards, barShimmer 1s linear infinite;
-}
-@keyframes barFill { from{width:0%} to{width:100%} }
-@keyframes barShimmer { 0%{background-position:0%} 100%{background-position:200%} }
-.loader-sub {
-  font-size: 12px; font-weight: 700; letter-spacing: 3px;
-  text-transform: uppercase; color: #ccc;
-  animation: textBlink 1s ease-in-out infinite;
-}
-@keyframes textBlink { 0%,100%{opacity:.4} 50%{opacity:1} }
+/* confetti */
+.cf{position:fixed;top:-10px;pointer-events:none;z-index:999;border-radius:2px;animation:cfFall linear forwards;}
+@keyframes cfFall{0%{transform:translateY(0) rotate(0);opacity:1;}100%{transform:translateY(110vh) rotate(720deg);opacity:0;}}
 
-/* ══ FLOATING PARTICLES on lobby ══ */
-.particle {
-  position: fixed; pointer-events: none; z-index: 1;
-  border-radius: 50%; opacity: 0;
-  animation: particleFloat linear infinite;
+/* toast */
+#toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(70px);
+  background:#1a1a2e;color:#fff;padding:10px 22px;border-radius:50px;
+  font-size:13px;font-weight:700;z-index:999;transition:transform .3s;white-space:nowrap;
 }
-@keyframes particleFloat {
-  0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-  10%  { opacity: .6; }
-  90%  { opacity: .4; }
-  100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
-}
+#toast.show{transform:translateX(-50%) translateY(0);}
 
-/* ══ LOBBY entrance stagger ══ */
-.logo       { animation: popIn .7s cubic-bezier(.34,1.56,.64,1) .2s both; }
-.card       { animation: slideUp .6s cubic-bezier(.34,1.56,.64,1) .45s both; }
+/* floating bg particles */
+.fp{position:fixed;border-radius:50%;pointer-events:none;z-index:0;animation:fpRise linear infinite;opacity:0;}
+@keyframes fpRise{0%{transform:translateY(100vh) rotate(0);opacity:0;}10%{opacity:.5;}90%{opacity:.3;}100%{transform:translateY(-120px) rotate(360deg);opacity:0;}}
+
+@media(max-width:380px){
+  .mode-grid{grid-template-columns:1fr 1fr;}
+  .mcard{padding:18px 10px;}
+}
 </style>
 </head>
 <body>
 
-<!-- LOADER -->
-<div id="loader">
-  <div class="loader-puck"></div>
-  <div class="loader-shadow"></div>
-  <div class="loader-title">
-    <span class="r">A</span><span class="b">I</span><span class="y">R</span>
-    <span class="g"> S</span><span class="r">M</span><span class="b">A</span><span class="y">S</span><span class="r">H</span>
-  </div>
-  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
-  <div class="loader-sub">Loading…</div>
+<!-- LOADING -->
+<div id="loading">
+  <div class="ld-puck"></div>
+  <div class="ld-shadow"></div>
+  <div class="ld-title">AIR SMASH 🏒</div>
+  <div class="ld-bar"><div class="ld-fill"></div></div>
 </div>
 
-<div class="blob b1"></div>
-<div class="blob b2"></div>
-<div class="blob b3"></div>
-<div class="blob b4"></div>
+<!-- BG -->
+<div class="bg-circle bc1"></div>
+<div class="bg-circle bc2"></div>
+<div class="bg-circle bc3"></div>
 
-<!-- BY MUSOKHAN BADGE -->
-<div class="by-musokhan-wrap" id="byMusokhan">
-  <div class="glow-ring"></div>
-  <a class="by-musokhan" href="https://t.me/musoxonman" target="_blank" rel="noopener">
+<!-- BY MUSOKHAN -->
+<div id="byBadge">
+  <a href="https://t.me/musoxonman" target="_blank" rel="noopener">
     <div class="by-dot"></div>
     <div class="by-inner">
       <span class="by-label">crafted by</span>
@@ -427,308 +320,350 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:none;}
   </a>
 </div>
 
-<!-- LOBBY -->
+<!-- ══ LOBBY ══ -->
 <div class="screen" id="sLobby">
-  <div class="logo">
+  <div class="logo-wrap">
     <span class="logo-icon">🏒</span>
-    <span class="logo-title">
-      <span class="r">A</span><span class="b">I</span><span class="y">R</span>
-      <span class="g"> S</span><span class="r">M</span><span class="b">A</span><span class="y">S</span><span class="r">H</span>
-    </span>
-    <div class="logo-sub">2-Minute Air Hockey</div>
+    <span class="logo-text">AIR SMASH</span>
+    <div class="logo-sub">2-Minute Multiplayer Hockey</div>
   </div>
   <div class="card">
-    <label class="lbl">Your Nickname</label>
-    <input class="name-inp" id="nameInp" maxlength="14" placeholder="Enter name…" value="Player">
-    <div class="row2">
-      <button class="bigbtn btn-create" onclick="goModes()">
-        <span class="ico">🚀</span>Create Room
-        <span class="sub">Host a game</span>
+    <label class="field-label">Your Nickname</label>
+    <input class="text-inp" id="nameInp" maxlength="14" placeholder="Enter name…" value="Player" style="margin-bottom:20px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <button class="btn btn-red" onclick="showModes()">
+        <span>🚀</span> Create
       </button>
-      <button class="bigbtn btn-join-l" onclick="goJoin()">
-        <span class="ico">🎮</span>Join Room
-        <span class="sub">Enter code</span>
+      <button class="btn btn-blue" onclick="showJoin()">
+        <span>🎮</span> Join
       </button>
     </div>
   </div>
 </div>
 
-<!-- MODES -->
-<div class="screen off" id="sModes">
-  <button class="back-btn" onclick="goScreen('sLobby')">←</button>
-  <div class="section-h">Choose Mode 🎯</div>
-  <div class="mode-row">
-    <div class="mcard ai" onclick="startVsAI()">
+<!-- ══ MODES ══ -->
+<div class="screen hidden" id="sModes">
+  <button class="back-btn" onclick="show('sLobby')">←</button>
+  <div class="logo-wrap" style="margin-bottom:4px;">
+    <span style="font-family:'Fredoka One',cursive;font-size:clamp(24px,5vw,36px);">Choose Mode 🎯</span>
+  </div>
+  <div class="mode-grid">
+    <div class="mcard ai" onclick="startAI()">
       <span class="mcard-icon">🤖</span>
-      <div class="mcard-title">VS AI</div>
-      <div class="mcard-desc">Play solo against a smart computer opponent</div>
+      <div class="mcard-name">VS AI</div>
+      <div class="mcard-info">Play against smart computer</div>
     </div>
-    <div class="mcard priv" onclick="createPrivate()">
+    <div class="mcard pvp" onclick="createRoom()">
       <span class="mcard-icon">🔒</span>
-      <div class="mcard-title">Private</div>
-      <div class="mcard-desc">Create a room & invite a friend with a secret code</div>
+      <div class="mcard-name">Private</div>
+      <div class="mcard-info">Invite a friend with code</div>
     </div>
   </div>
 </div>
 
-<!-- WAIT -->
-<div class="screen off" id="sWait">
-  <button class="back-btn" onclick="goScreen('sLobby')">←</button>
-  <div class="code-card">
-    <div class="lbl">🔑 Room Code · tap to copy</div>
-    <div class="code-num" id="codeDisp" onclick="copyCode()">----</div>
-    <div class="copy-hint" onclick="copyCode()">📋 Copy & share with friend</div>
+<!-- ══ WAIT ══ -->
+<div class="screen hidden" id="sWait">
+  <button class="back-btn" onclick="leaveWait()">←</button>
+  <div class="code-box">
+    <div class="field-label">🔑 Room Code — tap to copy</div>
+    <div class="code-digits" id="codeDisplay" onclick="copyCode()">----</div>
+    <div class="code-copy" onclick="copyCode()">📋 Tap to copy & share</div>
   </div>
-  <div class="dots"><div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div><div class="dot d4"></div></div>
-  <div class="wait-txt" id="waitTxt">Waiting for opponent to join…</div>
+  <div class="wait-dots">
+    <div class="wd"></div><div class="wd"></div><div class="wd"></div><div class="wd"></div>
+  </div>
+  <div class="wait-status" id="waitStatus">Waiting for opponent…</div>
 </div>
 
-<!-- JOIN -->
-<div class="screen off" id="sJoin">
-  <button class="back-btn" onclick="goScreen('sLobby')">←</button>
-  <div class="section-h">Join Room 🎮</div>
-  <input class="code-inp" id="codeInp" maxlength="4" placeholder="CODE" inputmode="numeric"
-    oninput="this.value=this.value.replace(/\D/g,'')">
-  <button class="go-btn" onclick="joinRoom()">Let's Go! →</button>
+<!-- ══ JOIN ══ -->
+<div class="screen hidden" id="sJoin">
+  <button class="back-btn" onclick="show('sLobby')">←</button>
+  <div class="logo-wrap" style="margin-bottom:4px;">
+    <span style="font-family:'Fredoka One',cursive;font-size:clamp(24px,5vw,36px);">Join Room 🎮</span>
+  </div>
+  <input class="code-input" id="joinCodeInp" maxlength="4" placeholder="0000" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'')">
+  <button class="btn btn-green" style="max-width:300px;" onclick="joinRoom()">
+    Let's Go! →
+  </button>
 </div>
 
-<!-- GAME -->
-<div class="screen off" id="sGame">
-  <div class="sbar">
-    <div class="sbar-left">
-      <div class="ptag ptag1">YOU</div>
-      <div class="pname" id="gName1">Player</div>
-      <div class="pscore sc1" id="gScore1">0</div>
+<!-- ══ GAME ══ -->
+<div class="screen hidden" id="sGame" style="padding:0;justify-content:flex-start;align-items:stretch;">
+  <div class="hud">
+    <div class="hud-player">
+      <div class="hud-tag t1">YOU</div>
+      <div class="hud-name" id="hudName1">Player</div>
+      <div class="hud-score s1" id="hudScore1">0</div>
     </div>
-    <div class="sbar-center">
-      <div class="vs-lbl">TIME</div>
-      <div class="timer-num" id="gTimer">2:00</div>
+    <div class="hud-center">
+      <div class="hud-vs">TIME</div>
+      <div class="hud-time" id="hudTimer">2:00</div>
     </div>
-    <div class="sbar-right-group">
-      <div class="sbar-right">
-        <div class="ptag ptag2">OPP</div>
-        <div class="pname" id="gName2">AI</div>
-        <div class="pscore sc2" id="gScore2">0</div>
-      </div>
-      <div class="sbar-actions">
-        <button class="icon-btn fs" onclick="toggleFullscreen()" title="Fullscreen">⛶</button>
-        <button class="icon-btn leave" onclick="leaveGame()" title="Leave">🚪</button>
-      </div>
+    <div class="hud-player">
+      <div class="hud-tag t2">OPP</div>
+      <div class="hud-name" id="hudName2">AI</div>
+      <div class="hud-score s2" id="hudScore2">0</div>
+    </div>
+    <div class="hud-actions">
+      <button class="hud-btn fs" onclick="toggleFS()" title="Fullscreen">⛶</button>
+      <button class="hud-btn leave" onclick="leaveGame()" title="Leave">🚪</button>
     </div>
   </div>
   <div class="canvas-wrap" id="canvasWrap">
     <canvas id="gc"></canvas>
-    <div class="click-hint" id="clickHint">🖱️ Click canvas<br>to lock mouse</div>
-    <div class="gflash" id="gFlash"></div>
-    <div class="goal-pop" id="goalPop">⚽ GOAL!</div>
-    <div class="overlay hidden" id="overlay">
+    <div class="click-hint" id="clickHint">🖱️ Click to lock mouse</div>
+    <div class="goal-flash" id="goalFlash"></div>
+    <div class="goal-pop" id="goalPop"></div>
+    <div class="overlay hidden" id="gameOver">
       <div class="ov-emoji" id="ovEmoji">🏆</div>
       <div class="ov-title" id="ovTitle">You Win!</div>
-      <div class="ov-sub" id="ovSub">2 – 1 · Great game!</div>
-      <div class="ov-btns">
-        <button class="ov-btn btn-again" onclick="restartGame()">🔄 Play Again</button>
-        <button class="ov-btn btn-lobby" onclick="goScreen('sLobby')">🏠 Lobby</button>
+      <div class="ov-sub" id="ovSub">3 – 1 · Amazing!</div>
+      <div class="ov-row">
+        <button class="ov-btn again" onclick="playAgain()">🔄 Play Again</button>
+        <button class="ov-btn lobby" onclick="leaveGame()">🏠 Lobby</button>
       </div>
     </div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════════════
+'use strict';
+// ═══════════════════════════════════════════════════════════
 // CONFIG
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 const WS_URL = window.location.protocol === 'https:'
   ? 'wss://' + window.location.host
   : 'ws://'  + window.location.host;
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// LOADING
+// ═══════════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loading').classList.add('out');
+    setTimeout(() => document.getElementById('loading').remove(), 650);
+    spawnParticles();
+  }, 1400);
+});
+
+// ═══════════════════════════════════════════════════════════
 // STATE
-// ═══════════════════════════════════════════════════
-let myName = 'Player', myRole = null, roomCode = null;
-let ws = null, pingInterval = null;
-let C, ctx, CW, CH;
-let gameActive = false, score1 = 0, score2 = 0, timeLeft = 120;
-let timerInt = null, raf = null, netFrame = 0;
-let pointerLocked = false;
-let lastPad1x = 0, lastPad1y = 0;
+// ═══════════════════════════════════════════════════════════
+let myName = 'Player';
+let myRole = null;   // 'ai' | 'host' | 'guest'
+let roomCode = null;
+let ws = null;
+let pingTimer = null;
 
-const GOAL_H  = 16;
-const GOAL_FR = 0.36;
-const PAD_FR  = 0.065;
-const GAME_SEC = 120;
-
-// Puck — single source of truth (only host mutates physics)
-const puck = { x:0, y:0, vx:0, vy:0, r:20, trail:[] };
-
-// pad1 = local player (always bottom), pad2 = opponent (always top)
-const pad1 = { x:0, y:0, r:40, tx:0, ty:0 };
-const pad2 = { x:0, y:0, r:40, tx:0, ty:0 };
-
-// AI state
-let aiWanderAngle=0, aiMode='defend', aiModeTimer=0;
-
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // NAVIGATION
-// ═══════════════════════════════════════════════════
-function goScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.add('off'));
-  document.getElementById(id).classList.remove('off');
-  const badge = document.getElementById('byMusokhan');
-  if(badge) badge.style.display = (id==='sGame') ? 'none' : '';
+// ═══════════════════════════════════════════════════════════
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  // Badge visible everywhere except game
+  document.getElementById('byBadge').style.display = id === 'sGame' ? 'none' : '';
 }
-function getName(){ return document.getElementById('nameInp').value.trim()||'Player'; }
-function goModes(){ myName=getName(); goScreen('sModes'); }
-function goJoin() { myName=getName(); goScreen('sJoin'); setTimeout(()=>document.getElementById('codeInp').focus(),300); }
 
-// ═══════════════════════════════════════════════════
+function getName() { return document.getElementById('nameInp').value.trim() || 'Player'; }
+function showModes() { myName = getName(); show('sModes'); }
+function showJoin()  { myName = getName(); show('sJoin'); setTimeout(() => document.getElementById('joinCodeInp').focus(), 200); }
+
+// ═══════════════════════════════════════════════════════════
 // WEBSOCKET
-// ═══════════════════════════════════════════════════
-function connectWS(onOpen){
-  if(ws && ws.readyState===WebSocket.OPEN){ onOpen(); return; }
+// ═══════════════════════════════════════════════════════════
+function connectWS(cb) {
+  if (ws && ws.readyState === WebSocket.OPEN) { cb(); return; }
+  if (ws) { ws.close(); ws = null; }
   ws = new WebSocket(WS_URL);
-  ws.onopen    = ()=>{ startPing(); onOpen(); };
-  ws.onmessage = (e)=>handleMsg(JSON.parse(e.data));
-  ws.onclose   = ()=>{ stopPing(); if(gameActive) showToast('⚠️ Connection lost!'); };
-  ws.onerror   = ()=>showToast('⚠️ Connection error!');
+  ws.onopen = () => {
+    pingTimer = setInterval(() => wsSend({ type: 'ping' }), 20000);
+    cb();
+  };
+  ws.onmessage = e => onMsg(JSON.parse(e.data));
+  ws.onclose = () => {
+    clearInterval(pingTimer);
+    if (gameRunning) toast('⚠️ Disconnected!');
+  };
+  ws.onerror = () => toast('❌ Connection failed');
 }
-function wsSend(obj){ if(ws && ws.readyState===WebSocket.OPEN) ws.send(JSON.stringify(obj)); }
-function startPing(){ pingInterval=setInterval(()=>wsSend({type:'ping'}),20000); }
-function stopPing() { clearInterval(pingInterval); }
+function wsSend(obj) {
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(obj));
+}
+function closeWS() {
+  clearInterval(pingTimer);
+  if (ws) { ws.close(); ws = null; }
+}
 
-function handleMsg(msg){
-  switch(msg.type){
+// ═══════════════════════════════════════════════════════════
+// WS MESSAGE HANDLER
+// ═══════════════════════════════════════════════════════════
+function onMsg(msg) {
+  switch (msg.type) {
     case 'created':
-      showToast('🔑 Room '+msg.code+' ready!');
+      toast('✅ Room ready!');
+      document.getElementById('waitStatus').textContent = 'Waiting for opponent…';
       break;
 
     case 'opponent_joined':
-      showToast('🎮 '+msg.opponentName+' joined!');
-      setTimeout(()=>launchGame(myName, msg.opponentName), 800);
+      // HOST: guest joined → start game
+      toast('🎮 ' + msg.opponentName + ' joined!');
+      setTimeout(() => startGame(myName, msg.opponentName), 700);
       break;
 
     case 'joined':
-      showToast('✅ Joined room '+msg.code+'!');
-      setTimeout(()=>launchGame(msg.opponentName||'Host', myName), 800);
+      // GUEST: joined → start game
+      toast('✅ Joined!');
+      // msg.hostName is name of host (our opponent = pad2)
+      setTimeout(() => startGame(myName, msg.hostName), 700);
       break;
 
     case 'error':
-      showToast('❌ '+msg.text);
+      toast('❌ ' + msg.text);
       break;
 
-    // Guest receives opponent paddle (host's pad1 → guest's pad2)
-    case 'paddle':
-      pad2.tx = msg.x;
-      pad2.ty = msg.y;
+    // ── in-game ──
+    case 'opponent_paddle':
+      // We receive opponent's paddle as pad2
+      // Coordinates already in our space (server just relays raw)
+      // Both host and guest use same coordinate system (no mirroring)
+      pad2.tx = msg.x * CW;
+      pad2.ty = msg.y * CH;
       break;
 
-    // Guest receives puck from host — DIRECT SET, no transform
-    case 'puck':
-      if(myRole==='guest'){
-        puck.x  = msg.x;
-        puck.y  = msg.y;
-        puck.vx = msg.vx;
-        puck.vy = msg.vy;
+    case 'puck_state':
+      // GUEST receives host's authoritative puck state
+      if (myRole === 'guest') {
+        puck.x  = msg.px * CW;
+        puck.y  = msg.py * CH;
+        puck.vx = msg.vx * CW;
+        puck.vy = msg.vy * CH;
       }
       break;
 
     case 'goal':
-      if(myRole==='guest'){
-        score1   = msg.s1;
-        score2   = msg.s2;
-        gameActive = false;
-        updateScoreUI(msg.scorer);
-        flashGoal(msg.scorer===1?'#FF4757':'#2979FF',
-                  msg.scorer===1?'🔴 GOAL!':'🔵 GOAL!');
-        confetti();
-        setTimeout(()=>{ gameActive=true; }, 1800);
+      // GUEST receives goal event from host
+      if (myRole === 'guest') {
+        score1 = msg.s_guest;
+        score2 = msg.s_host;
+        onGoalEffect(msg.scorer_is_guest ? 1 : 2);
+        if (!msg.game_over) {
+          gameRunning = false;
+          setTimeout(() => { resetPuck(); gameRunning = true; }, 1700);
+        }
       }
       break;
 
-    case 'reset_puck':
-      if(myRole==='guest'){
-        puck.x=msg.x; puck.y=msg.y; puck.vx=msg.vx; puck.vy=msg.vy;
-        puck.trail=[];
+    case 'game_over':
+      if (myRole === 'guest') {
+        score1 = msg.s_guest;
+        score2 = msg.s_host;
+        showGameOver();
       }
       break;
 
-    case 'gameover':
-      if(myRole==='guest'){
-        score1=msg.s1; score2=msg.s2;
-        endGame();
-      }
-      break;
-
-    case 'restart_go':
-      score1=0; score2=0; updateScoreUI(0);
-      document.getElementById('overlay').classList.add('hidden');
-      if(myRole==='host') resetPuck(0);
-      startTimer();
-      gameActive=true;
-      break;
-
-    case 'restart_request':
-      showToast('🔄 Opponent wants rematch!');
-      wsSend({type:'restart_ok'});
+    case 'restart_ok':
+      // Both restart
+      doRestart();
       break;
 
     case 'opponent_left':
-      showToast('👋 Opponent left');
-      gameActive=false;
-      clearInterval(timerInt);
-      setTimeout(()=>goScreen('sLobby'), 2000);
+      toast('👋 Opponent left');
+      gameRunning = false;
+      clearInterval(timerInterval);
+      setTimeout(() => leaveGame(), 2000);
       break;
 
     case 'pong': break;
   }
 }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // ROOM ACTIONS
-// ═══════════════════════════════════════════════════
-function startVsAI(){
-  myRole='ai';
-  launchGame(myName,'🤖 Bot');
+// ═══════════════════════════════════════════════════════════
+function startAI() {
+  myName = getName();
+  myRole = 'ai';
+  startGame(myName, '🤖 Bot');
 }
 
-function createPrivate(){
-  myName=getName(); myRole='host';
-  roomCode=String(Math.floor(1000+Math.random()*9000));
-  document.getElementById('codeDisp').textContent=roomCode;
-  document.getElementById('waitTxt').textContent='Connecting…';
-  goScreen('sWait');
-  connectWS(()=>{
-    wsSend({type:'create', code:roomCode, name:myName});
-    document.getElementById('waitTxt').textContent='Waiting for opponent…';
+function createRoom() {
+  myName = getName();
+  myRole = 'host';
+  roomCode = String(Math.floor(1000 + Math.random() * 9000));
+  document.getElementById('codeDisplay').textContent = roomCode;
+  document.getElementById('waitStatus').textContent = 'Connecting…';
+  show('sWait');
+  connectWS(() => {
+    wsSend({ type: 'create', code: roomCode, name: myName });
   });
 }
 
-function copyCode(){
-  if(!roomCode) return;
-  navigator.clipboard?.writeText(roomCode).then(()=>showToast('📋 Code copied!'));
-  document.getElementById('codeDisp').style.transform='scale(.93)';
-  setTimeout(()=>document.getElementById('codeDisp').style.transform='',150);
+function copyCode() {
+  if (!roomCode) return;
+  navigator.clipboard?.writeText(roomCode).then(() => toast('📋 Copied!'));
+  const el = document.getElementById('codeDisplay');
+  el.style.transform = 'scale(.92)';
+  setTimeout(() => el.style.transform = '', 140);
 }
 
-function joinRoom(){
-  const code=document.getElementById('codeInp').value.trim();
-  if(code.length!==4){ showToast('⚠️ Enter 4-digit code!'); return; }
-  myName=getName(); myRole='guest'; roomCode=code;
-  showToast('🔌 Connecting…');
-  connectWS(()=>wsSend({type:'join', code, name:myName}));
+function leaveWait() {
+  closeWS();
+  show('sLobby');
 }
 
-// ═══════════════════════════════════════════════════
-// GAME LAUNCH
-// ═══════════════════════════════════════════════════
-function launchGame(n1, n2){
-  document.getElementById('gName1').textContent=n1;
-  document.getElementById('gName2').textContent=n2;
-  score1=0; score2=0;
-  updateScoreUI(0);
-  document.getElementById('overlay').classList.add('hidden');
-  goScreen('sGame');
+function joinRoom() {
+  const code = document.getElementById('joinCodeInp').value.trim();
+  if (code.length !== 4) { toast('⚠️ Enter 4-digit code!'); return; }
+  myName = getName();
+  myRole = 'guest';
+  roomCode = code;
+  toast('🔌 Connecting…');
+  connectWS(() => {
+    wsSend({ type: 'join', code, name: myName });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// GAME CONSTANTS
+// ═══════════════════════════════════════════════════════════
+const GAME_SECS  = 120;
+const GOAL_FRAC  = 0.36;   // goal width as fraction of canvas width
+const GOAL_DEPTH = 14;     // px
+
+// ═══════════════════════════════════════════════════════════
+// GAME STATE
+// ═══════════════════════════════════════════════════════════
+let C, ctx, CW, CH;
+let gameRunning = false;
+let score1 = 0, score2 = 0;
+let timeLeft = GAME_SECS;
+let timerInterval = null;
+let rafId = null;
+let netTick = 0;
+
+// Objects — normalised positions used for network, pixel for render
+const puck = { x:0, y:0, vx:0, vy:0, r:0, trail:[] };
+// pad1 = my paddle (always bottom half, red)
+// pad2 = opponent paddle (always top half, blue)
+const pad1 = { x:0, y:0, r:0, tx:0, ty:0 };
+const pad2 = { x:0, y:0, r:0, tx:0, ty:0 };
+
+// AI
+let aiMode = 'defend', aiTimer = 0, aiWander = 0;
+
+// ═══════════════════════════════════════════════════════════
+// START GAME
+// ═══════════════════════════════════════════════════════════
+function startGame(name1, name2) {
+  document.getElementById('hudName1').textContent = name1;
+  document.getElementById('hudName2').textContent = name2;
+  score1 = 0; score2 = 0;
+  updateHUD();
+  document.getElementById('gameOver').classList.add('hidden');
+  show('sGame');
 
   C   = document.getElementById('gc');
   ctx = C.getContext('2d');
@@ -736,533 +671,548 @@ function launchGame(n1, n2){
   window.addEventListener('resize', resizeCanvas);
   setupInput();
 
-  // Init puck AFTER resize so r is set
-  resetPuck(0);
+  pad1.tx = CW / 2; pad1.ty = CH * 0.82;
+  pad2.tx = CW / 2; pad2.ty = CH * 0.18;
+
+  resetPuck();
   startTimer();
-  gameActive=true;
-  netFrame=0;
-  if(raf) cancelAnimationFrame(raf);
-  loop();
+  gameRunning = true;
+  if (rafId) cancelAnimationFrame(rafId);
+  gameLoop();
 }
 
-function resizeCanvas(){
-  const wrap=document.getElementById('canvasWrap');
-  CW=wrap.clientWidth; CH=wrap.clientHeight;
-  C.width=CW; C.height=CH;
-  const minD=Math.min(CW,CH);
-  puck.r  = minD*0.030;
-  pad1.r  = minD*PAD_FR;
-  pad2.r  = minD*PAD_FR;
-  pad1.x  = CW/2; pad1.y=CH*0.82;
-  pad2.x  = CW/2; pad2.y=CH*0.18;
-  pad1.tx = pad1.x; pad1.ty=pad1.y;
-  pad2.tx = pad2.x; pad2.ty=pad2.y;
-  lastPad1x=pad1.x; lastPad1y=pad1.y;
+function resizeCanvas() {
+  const wrap = document.getElementById('canvasWrap');
+  CW = wrap.clientWidth;
+  CH = wrap.clientHeight;
+  C.width  = CW;
+  C.height = CH;
+  const m = Math.min(CW, CH);
+  puck.r = m * 0.028;
+  pad1.r = pad2.r = m * 0.062;
+  // Recentre paddles
+  if (!gameRunning) {
+    pad1.x = pad1.tx = CW / 2; pad1.y = pad1.ty = CH * 0.82;
+    pad2.x = pad2.tx = CW / 2; pad2.y = pad2.ty = CH * 0.18;
+  }
 }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // TIMER
-// ═══════════════════════════════════════════════════
-function startTimer(){
-  timeLeft=GAME_SEC;
-  clearInterval(timerInt);
+// ═══════════════════════════════════════════════════════════
+function startTimer() {
+  timeLeft = GAME_SECS;
+  clearInterval(timerInterval);
   renderTimer();
-  timerInt=setInterval(()=>{
-    if(!gameActive) return;
+  timerInterval = setInterval(() => {
+    if (!gameRunning) return;
     timeLeft--;
     renderTimer();
-    if(timeLeft<=0 && myRole!=='guest') endGame();
-  },1000);
-}
-function renderTimer(){
-  const m=Math.floor(timeLeft/60), s=timeLeft%60;
-  const el=document.getElementById('gTimer');
-  el.textContent=m+':'+String(s).padStart(2,'0');
-  el.classList.toggle('urgent', timeLeft<=15);
+    // Only host / AI mode ends game
+    if (timeLeft <= 0 && myRole !== 'guest') showGameOver();
+  }, 1000);
 }
 
-// ═══════════════════════════════════════════════════
+function renderTimer() {
+  const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+  const el = document.getElementById('hudTimer');
+  el.textContent = m + ':' + String(s).padStart(2, '0');
+  el.classList.toggle('red', timeLeft <= 15);
+}
+
+// ═══════════════════════════════════════════════════════════
 // INPUT
-// ═══════════════════════════════════════════════════
-function setupInput(){
-  C.addEventListener('click', ()=>{
-    if(!document.pointerLockElement) C.requestPointerLock();
+// ═══════════════════════════════════════════════════════════
+let pointerLocked = false;
+
+function setupInput() {
+  // Pointer lock for precision on PC
+  C.addEventListener('click', () => {
+    if (!document.pointerLockElement) C.requestPointerLock();
   });
-  document.addEventListener('pointerlockchange', ()=>{
-    pointerLocked=!!document.pointerLockElement;
-    const hint=document.getElementById('clickHint');
-    if(hint) hint.classList.toggle('gone', pointerLocked);
+  document.addEventListener('pointerlockchange', () => {
+    pointerLocked = !!document.pointerLockElement;
+    document.getElementById('clickHint').classList.toggle('gone', pointerLocked);
   });
-  document.addEventListener('mousemove', (e)=>{
-    if(!pointerLocked) return;
-    pad1.tx=clamp(pad1.tx+e.movementX, pad1.r, CW-pad1.r);
-    pad1.ty=clamp(pad1.ty+e.movementY, CH*0.52, CH-pad1.r);
+  document.addEventListener('mousemove', e => {
+    if (!pointerLocked) return;
+    pad1.tx = clamp(pad1.tx + e.movementX, pad1.r, CW - pad1.r);
+    pad1.ty = clamp(pad1.ty + e.movementY, CH * 0.52, CH - pad1.r);
   });
-  C.addEventListener('mousemove', (e)=>{
-    if(pointerLocked) return;
-    const r=C.getBoundingClientRect();
-    pad1.tx=clamp((e.clientX-r.left)*(CW/r.width), pad1.r, CW-pad1.r);
-    pad1.ty=clamp((e.clientY-r.top)*(CH/r.height), CH*0.52, CH-pad1.r);
+  // Fallback (no lock)
+  C.addEventListener('mousemove', e => {
+    if (pointerLocked) return;
+    const r = C.getBoundingClientRect();
+    pad1.tx = clamp((e.clientX - r.left) * (CW / r.width), pad1.r, CW - pad1.r);
+    pad1.ty = clamp((e.clientY - r.top)  * (CH / r.height), CH * 0.52, CH - pad1.r);
   });
-  document.addEventListener('keydown',(e)=>{
-    if(e.key==='Escape' && pointerLocked) document.exitPointerLock();
-  });
-  C.addEventListener('touchmove', onTouch,{passive:false});
-  C.addEventListener('touchstart',onTouch,{passive:false});
+  // Touch
+  C.addEventListener('touchmove',  onTouch, { passive: false });
+  C.addEventListener('touchstart', onTouch, { passive: false });
 }
 
-function onTouch(e){
+function onTouch(e) {
   e.preventDefault();
-  const r=C.getBoundingClientRect();
-  const sx=CW/r.width, sy=CH/r.height;
-  for(const t of e.touches){
-    const mx=(t.clientX-r.left)*sx;
-    const my=(t.clientY-r.top)*sy;
-    if(my>CH/2){
-      pad1.tx=clamp(mx,pad1.r,CW-pad1.r);
-      pad1.ty=clamp(my,CH*0.52,CH-pad1.r);
-    } else {
-      pad2.tx=clamp(mx,pad2.r,CW-pad2.r);
-      pad2.ty=clamp(my,pad2.r,CH*0.47);
+  const r = C.getBoundingClientRect();
+  const sx = CW / r.width, sy = CH / r.height;
+  for (const t of e.touches) {
+    const mx = (t.clientX - r.left) * sx;
+    const my = (t.clientY - r.top)  * sy;
+    if (my > CH / 2) {
+      pad1.tx = clamp(mx, pad1.r, CW - pad1.r);
+      pad1.ty = clamp(my, CH * 0.52, CH - pad1.r);
     }
   }
 }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // PUCK RESET
-// ═══════════════════════════════════════════════════
-function resetPuck(last){
-  puck.x=CW/2; puck.y=CH/2;
-  const base=Math.min(CW,CH)*0.013;
-  const angle=last===1
-    ? -Math.PI/2+(Math.random()-.5)*1.0
-    :  Math.PI/2+(Math.random()-.5)*1.0;
-  puck.vx=Math.cos(angle)*base;
-  puck.vy=Math.sin(angle)*base;
-  puck.trail=[];
-  // Tell guest about reset
-  if(myRole==='host'){
-    wsSend({type:'reset_puck', x:puck.x, y:puck.y, vx:puck.vx, vy:puck.vy});
-  }
+// ═══════════════════════════════════════════════════════════
+function resetPuck() {
+  puck.x = CW / 2; puck.y = CH / 2;
+  puck.trail = [];
+  const base  = Math.min(CW, CH) * 0.012;
+  const angle = (Math.random() > 0.5 ? -1 : 1) * (Math.PI / 2) + (Math.random() - 0.5) * 0.9;
+  puck.vx = Math.cos(angle) * base;
+  puck.vy = Math.sin(angle) * base;
 }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // AI
-// ═══════════════════════════════════════════════════
-function updateAI(){
-  const spd=Math.min(CW,CH)*0.013;
-  aiModeTimer--;
-  if(aiModeTimer<=0){
-    if(puck.y<CH*0.48 && puck.vy<-0.5)     { aiMode='attack';  aiModeTimer=30; }
-    else if(puck.vy>0.5)                     { aiMode='defend';  aiModeTimer=20; }
-    else { aiMode='wander'; aiModeTimer=40; aiWanderAngle=Math.random()*Math.PI*2; }
+// ═══════════════════════════════════════════════════════════
+function stepAI() {
+  const spd = Math.min(CW, CH) * 0.012;
+  aiTimer--;
+  if (aiTimer <= 0) {
+    if (puck.y < CH * 0.46 && puck.vy < 0) { aiMode = 'attack'; aiTimer = 35; }
+    else if (puck.vy > 0)                   { aiMode = 'defend'; aiTimer = 25; }
+    else { aiMode = 'wander'; aiTimer = 50; aiWander = Math.random() * Math.PI * 2; }
   }
-  let tx,ty;
-  if(aiMode==='attack'){
-    const off=(puck.x<CW/2)?pad2.r*.8:-pad2.r*.8;
-    tx=puck.x+off; ty=puck.y-pad2.r*1.2;
-  } else if(aiMode==='defend'){
-    tx=CW/2+(puck.x-CW/2)*.5; ty=CH*0.15;
+  let tx, ty;
+  if (aiMode === 'attack') {
+    const off = puck.x < CW / 2 ? pad2.r : -pad2.r;
+    tx = puck.x + off * 0.6;
+    ty = puck.y - pad2.r;
+  } else if (aiMode === 'defend') {
+    tx = CW / 2 + (puck.x - CW / 2) * 0.45;
+    ty = CH * 0.14;
   } else {
-    tx=CW/2+Math.cos(aiWanderAngle)*CW*.25;
-    ty=CH*0.22+Math.sin(aiWanderAngle)*CH*.08;
-    aiWanderAngle+=0.06;
+    tx = CW / 2 + Math.cos(aiWander) * CW * 0.22;
+    ty = CH * 0.20 + Math.sin(aiWander) * CH * 0.07;
+    aiWander += 0.055;
   }
-  pad2.tx=clamp(tx,pad2.r,CW-pad2.r);
-  pad2.ty=clamp(ty,pad2.r,CH*0.46);
-  const dx=pad2.tx-pad2.x, dy=pad2.ty-pad2.y, d=Math.hypot(dx,dy);
-  if(d>1){ pad2.x+=dx/d*Math.min(spd,d); pad2.y+=dy/d*Math.min(spd,d); }
-  pad2.x=clamp(pad2.x,pad2.r,CW-pad2.r);
-  pad2.y=clamp(pad2.y,pad2.r,CH*0.47);
+  tx = clamp(tx, pad2.r, CW - pad2.r);
+  ty = clamp(ty, pad2.r, CH * 0.46);
+  const dx = tx - pad2.x, dy = ty - pad2.y, d = Math.hypot(dx, dy);
+  if (d > 1) { pad2.x += dx / d * Math.min(spd, d); pad2.y += dy / d * Math.min(spd, d); }
+  pad2.x = clamp(pad2.x, pad2.r, CW - pad2.r);
+  pad2.y = clamp(pad2.y, pad2.r, CH * 0.47);
 }
 
-// ═══════════════════════════════════════════════════
-// PHYSICS (HOST + AI only)
-// ═══════════════════════════════════════════════════
-function updatePhysics(){
-  // ── Pad1 (local player) — always runs ──
-  const pvx=pad1.tx-pad1.x, pvy=pad1.ty-pad1.y;
-  pad1.x=clamp(pad1.tx, pad1.r, CW-pad1.r);
-  pad1.y=clamp(pad1.ty, CH*0.52, CH-pad1.r);
+// ═══════════════════════════════════════════════════════════
+// PHYSICS (HOST / AI only — guest just renders received state)
+// ═══════════════════════════════════════════════════════════
+function stepPhysics() {
+  // Move player paddle
+  pad1.x = clamp(pad1.tx, pad1.r, CW - pad1.r);
+  pad1.y = clamp(pad1.ty, CH * 0.52, CH - pad1.r);
 
-  // ── Pad2 (opponent) ──
-  if(myRole==='ai'){
-    updateAI(); // AI controls pad2 directly
+  // Move opponent paddle
+  if (myRole === 'ai') {
+    stepAI();
   } else {
-    // Multiplayer: smoothly move pad2 toward received network position
-    const dx=pad2.tx-pad2.x, dy=pad2.ty-pad2.y, d=Math.hypot(dx,dy);
-    const spd=Math.min(CW,CH)*0.02;
-    if(d>1){ pad2.x+=dx/d*Math.min(spd,d); pad2.y+=dy/d*Math.min(spd,d); }
-    pad2.x=clamp(pad2.x,pad2.r,CW-pad2.r);
-    pad2.y=clamp(pad2.y,pad2.r,CH*0.47);
+    // multiplayer: pad2 moves toward received network position
+    const dx = pad2.tx - pad2.x, dy = pad2.ty - pad2.y, d = Math.hypot(dx, dy);
+    const spd = Math.min(CW, CH) * 0.018;
+    if (d > 1) { pad2.x += dx / d * Math.min(spd, d); pad2.y += dy / d * Math.min(spd, d); }
+    pad2.x = clamp(pad2.x, pad2.r, CW - pad2.r);
+    pad2.y = clamp(pad2.y, pad2.r, CH * 0.47);
   }
 
-  // ── Trail (draw regardless of role) ──
-  puck.trail.push({x:puck.x, y:puck.y});
-  if(puck.trail.length>15) puck.trail.shift();
+  // Trail
+  puck.trail.push({ x: puck.x, y: puck.y });
+  if (puck.trail.length > 14) puck.trail.shift();
 
-  // ── Guest: no physics, puck comes from network ──
-  if(myRole==='guest') return;
+  puck.x += puck.vx;
+  puck.y += puck.vy;
 
-  // ── Host / AI: full puck physics ──
-  puck.x+=puck.vx; puck.y+=puck.vy;
-
-  // Speed cap
-  let spd=Math.hypot(puck.vx,puck.vy);
-  const maxS=Math.min(CW,CH)*0.024;
-  const minS=Math.min(CW,CH)*0.008;
-  if(spd>maxS){ puck.vx=puck.vx/spd*maxS; puck.vy=puck.vy/spd*maxS; }
-  if(spd<minS){
-    if(spd<0.01){ const a=Math.random()*Math.PI*2; puck.vx=Math.cos(a)*minS; puck.vy=Math.sin(a)*minS; }
-    else { puck.vx=puck.vx/spd*minS; puck.vy=puck.vy/spd*minS; }
+  // Speed clamp
+  let spd = Math.hypot(puck.vx, puck.vy);
+  const maxSpd = Math.min(CW, CH) * 0.023;
+  const minSpd = Math.min(CW, CH) * 0.008;
+  if (spd > maxSpd) { puck.vx = puck.vx / spd * maxSpd; puck.vy = puck.vy / spd * maxSpd; }
+  if (spd < 0.5) {
+    const a = Math.random() * Math.PI * 2;
+    puck.vx = Math.cos(a) * minSpd; puck.vy = Math.sin(a) * minSpd;
+  } else if (spd < minSpd) {
+    puck.vx = puck.vx / spd * minSpd; puck.vy = puck.vy / spd * minSpd;
   }
 
-  // Wall bounce
-  if(puck.x-puck.r<0)  { puck.x=puck.r;    puck.vx=Math.abs(puck.vx); }
-  if(puck.x+puck.r>CW) { puck.x=CW-puck.r; puck.vx=-Math.abs(puck.vx); }
+  // Side walls
+  if (puck.x - puck.r < 0)  { puck.x = puck.r;       puck.vx =  Math.abs(puck.vx); }
+  if (puck.x + puck.r > CW) { puck.x = CW - puck.r;  puck.vx = -Math.abs(puck.vx); }
 
-  const gW=CW*GOAL_FR, gL=(CW-gW)/2, gR=gL+gW;
+  // Goal zones
+  const gW = CW * GOAL_FRAC, gL = (CW - gW) / 2, gR = gL + gW;
 
-  if(puck.y-puck.r<GOAL_H){
-    if(puck.x>gL && puck.x<gR){ goalScored(1); return; }
-    puck.y=GOAL_H+puck.r; puck.vy=Math.abs(puck.vy);
+  if (puck.y - puck.r < GOAL_DEPTH) {
+    if (puck.x > gL && puck.x < gR) { handleGoal(1); return; }  // scored in TOP goal → player 1 scores
+    puck.y = GOAL_DEPTH + puck.r; puck.vy = Math.abs(puck.vy);
   }
-  if(puck.y+puck.r>CH-GOAL_H){
-    if(puck.x>gL && puck.x<gR){ goalScored(2); return; }
-    puck.y=CH-GOAL_H-puck.r; puck.vy=-Math.abs(puck.vy);
+  if (puck.y + puck.r > CH - GOAL_DEPTH) {
+    if (puck.x > gL && puck.x < gR) { handleGoal(2); return; }  // scored in BOTTOM goal → player 2 scores
+    puck.y = CH - GOAL_DEPTH - puck.r; puck.vy = -Math.abs(puck.vy);
   }
 
-  collidePad(pad1, pvx, pvy);
-  collidePad(pad2, 0, 0);
+  collidePuck(pad1);
+  collidePuck(pad2);
 }
 
-function collidePad(pad, pvx, pvy){
-  const dx=puck.x-pad.x, dy=puck.y-pad.y;
-  const dist=Math.hypot(dx,dy);
-  const minD=puck.r+pad.r;
-  if(dist<minD && dist>0.01){
-    const nx=dx/dist, ny=dy/dist;
-    puck.x=pad.x+nx*minD*1.01;
-    puck.y=pad.y+ny*minD*1.01;
-    const dot=puck.vx*nx+puck.vy*ny;
-    if(dot<0){ puck.vx-=2*dot*nx; puck.vy-=2*dot*ny; }
-    puck.vx+=pvx*0.5; puck.vy+=pvy*0.5;
-    const s2=Math.hypot(puck.vx,puck.vy);
-    const mx=Math.min(CW,CH)*0.024;
-    if(s2>mx){ puck.vx=puck.vx/s2*mx; puck.vy=puck.vy/s2*mx; }
-  }
-}
-
-function clamp(v,min,max){ return v<min?min:v>max?max:v; }
-
-// ═══════════════════════════════════════════════════
-// NETWORK SYNC (every 2 frames)
-// ═══════════════════════════════════════════════════
-function syncNetwork(){
-  if(!ws || ws.readyState!==WebSocket.OPEN) return;
-  // Send MY paddle position to opponent
-  wsSend({type:'paddle', x:pad1.x, y:pad1.y});
-  // Host also sends authoritative puck state
-  if(myRole==='host'){
-    wsSend({type:'puck', x:puck.x, y:puck.y, vx:puck.vx, vy:puck.vy});
+function collidePuck(pad) {
+  const dx = puck.x - pad.x, dy = puck.y - pad.y;
+  const dist = Math.hypot(dx, dy);
+  const minD = puck.r + pad.r;
+  if (dist < minD && dist > 0.01) {
+    const nx = dx / dist, ny = dy / dist;
+    // Push out
+    puck.x = pad.x + nx * minD;
+    puck.y = pad.y + ny * minD;
+    // Reflect
+    const dot = puck.vx * nx + puck.vy * ny;
+    if (dot < 0) {
+      puck.vx -= 2 * dot * nx;
+      puck.vy -= 2 * dot * ny;
+    }
+    // Spin from paddle movement
+    const padVx = (pad === pad1) ? (pad1.tx - pad1.x) * 0.4 : 0;
+    const padVy = (pad === pad1) ? (pad1.ty - pad1.y) * 0.4 : 0;
+    puck.vx += padVx; puck.vy += padVy;
+    // Re-clamp
+    const s = Math.hypot(puck.vx, puck.vy);
+    const mx = Math.min(CW, CH) * 0.023;
+    if (s > mx) { puck.vx = puck.vx / s * mx; puck.vy = puck.vy / s * mx; }
   }
 }
 
-// ═══════════════════════════════════════════════════
-// GOAL / END
-// ═══════════════════════════════════════════════════
-function goalScored(scorer){
-  if(!gameActive) return;
-  gameActive=false;
-  if(scorer===1) score1++; else score2++;
-  updateScoreUI(scorer);
-  flashGoal(scorer===1?'#FF4757':'#2979FF', scorer===1?'🔴 GOAL!':'🔵 GOAL!');
-  confetti();
-  if(myRole==='host') wsSend({type:'goal', scorer, s1:score1, s2:score2});
-  setTimeout(()=>{
-    if(timeLeft<=0){ endGame(); return; }
-    resetPuck(scorer);
-    gameActive=true;
-  }, 1800);
-}
+// ═══════════════════════════════════════════════════════════
+// GOAL
+// Host decides goal. Guest receives via WS.
+// pad1 = bottom (YOU), pad2 = top (OPP)
+// scorer=1 means YOU scored (puck in top goal)
+// scorer=2 means OPP scored (puck in bottom goal)
+// ═══════════════════════════════════════════════════════════
+function handleGoal(scorer) {
+  if (!gameRunning) return;
+  gameRunning = false;
 
-function updateScoreUI(scorer){
-  document.getElementById('gScore1').textContent=score1;
-  document.getElementById('gScore2').textContent=score2;
-  if(scorer===1||scorer===2){
-    const el=document.getElementById(scorer===1?'gScore1':'gScore2');
-    el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+  if (scorer === 1) score1++;
+  else score2++;
+
+  updateHUD(scorer);
+  onGoalEffect(scorer);
+
+  // Notify guest
+  if (myRole === 'host') {
+    const gameOver = (timeLeft <= 0);
+    wsSend({
+      type: 'goal',
+      scorer_is_guest: scorer === 2, // guest is OPP (pad2), so if scorer=2 guest scored
+      s_guest: score2,               // from host perspective: guest = opponent = score2
+      s_host:  score1,
+      game_over: gameOver
+    });
   }
+
+  if (timeLeft <= 0) { showGameOver(); return; }
+  setTimeout(() => { resetPuck(); gameRunning = true; }, 1700);
 }
 
-function flashGoal(color,txt){
-  const fl=document.getElementById('gFlash');
-  fl.style.background=color+'2a'; fl.style.opacity='1';
-  setTimeout(()=>fl.style.opacity='0',500);
-  const gp=document.getElementById('goalPop');
-  gp.textContent=txt; gp.style.color=color;
-  gp.classList.remove('hide','show'); void gp.offsetWidth;
+function onGoalEffect(scorer) {
+  const color = scorer === 1 ? '#FF4757' : '#2979FF';
+  const text  = scorer === 1 ? '🔴 GOAL!' : '🔵 GOAL!';
+  // Flash
+  const fl = document.getElementById('goalFlash');
+  fl.style.background = color + '28';
+  fl.style.opacity = '1';
+  setTimeout(() => fl.style.opacity = '0', 450);
+  // Pop text
+  const gp = document.getElementById('goalPop');
+  gp.textContent = text; gp.style.color = color;
+  gp.classList.remove('gone', 'show'); void gp.offsetWidth;
   gp.classList.add('show');
-  setTimeout(()=>{ gp.classList.remove('show'); gp.classList.add('hide'); },1400);
-  setTimeout(()=>gp.classList.remove('hide'),1800);
+  setTimeout(() => { gp.classList.remove('show'); gp.classList.add('gone'); }, 1300);
+  setTimeout(() => gp.classList.remove('gone'), 1600);
+  // Confetti
+  launchConfetti();
 }
 
-function endGame(){
-  gameActive=false; clearInterval(timerInt);
-  if(myRole==='host') wsSend({type:'gameover', s1:score1, s2:score2});
-  document.getElementById('overlay').classList.remove('hidden');
-  let emoji,title,sub;
-  if(score1>score2)      { emoji='🏆'; title='You Win!';   sub=score1+' – '+score2+' · Amazing!'; }
-  else if(score2>score1) { emoji='😅'; title='You Lose!';  sub=score1+' – '+score2+' · Try again!'; }
-  else                   { emoji='🤝'; title="It's a Draw!"; sub=score1+' – '+score2+' · So close!'; }
-  document.getElementById('ovEmoji').textContent=emoji;
-  document.getElementById('ovTitle').textContent=title;
-  document.getElementById('ovSub').textContent=sub;
-  confetti(); setTimeout(confetti,400);
-}
-
-function restartGame(){
-  if(myRole==='ai'){
-    score1=0; score2=0; updateScoreUI(0);
-    document.getElementById('overlay').classList.add('hidden');
-    resetPuck(0); startTimer(); gameActive=true;
-  } else {
-    wsSend({type:'restart'}); showToast('🔄 Rematch requested…');
+// ═══════════════════════════════════════════════════════════
+// HUD UPDATE
+// ═══════════════════════════════════════════════════════════
+function updateHUD(bumpPlayer) {
+  document.getElementById('hudScore1').textContent = score1;
+  document.getElementById('hudScore2').textContent = score2;
+  if (bumpPlayer) {
+    const el = document.getElementById(bumpPlayer === 1 ? 'hudScore1' : 'hudScore2');
+    el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
   }
 }
 
-// ═══════════════════════════════════════════════════
-// MAIN LOOP
-// ═══════════════════════════════════════════════════
-function loop(){
-  if(gameActive) updatePhysics();
-  draw();
-  netFrame++;
-  if(netFrame%2===0 && myRole!=='ai') syncNetwork();
-  raf=requestAnimationFrame(loop);
+// ═══════════════════════════════════════════════════════════
+// NETWORK SEND (every 2 frames)
+// ═══════════════════════════════════════════════════════════
+function sendNetState() {
+  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+  // Send MY paddle position normalised 0..1
+  wsSend({ type: 'my_paddle', x: pad1.x / CW, y: pad1.y / CH });
+  // Host also sends puck state
+  if (myRole === 'host') {
+    wsSend({ type: 'puck_state', px: puck.x / CW, py: puck.y / CH, vx: puck.vx / CW, vy: puck.vy / CH });
+  }
 }
 
-// ═══════════════════════════════════════════════════
-// DRAW
-// ═══════════════════════════════════════════════════
-function draw(){
-  ctx.clearRect(0,0,CW,CH);
+// ═══════════════════════════════════════════════════════════
+// GAME LOOP
+// ═══════════════════════════════════════════════════════════
+function gameLoop() {
+  // Physics: host + ai run full sim. Guest only moves paddles.
+  if (gameRunning) {
+    if (myRole === 'guest') {
+      // Guest: move own paddle, animate pad2 from received pos
+      pad1.x = clamp(pad1.tx, pad1.r, CW - pad1.r);
+      pad1.y = clamp(pad1.ty, CH * 0.52, CH - pad1.r);
+      const dx = pad2.tx - pad2.x, dy = pad2.ty - pad2.y, d = Math.hypot(dx, dy);
+      const sp = Math.min(CW, CH) * 0.018;
+      if (d > 1) { pad2.x += dx / d * Math.min(sp, d); pad2.y += dy / d * Math.min(sp, d); }
+      // Trail for puck
+      puck.trail.push({ x: puck.x, y: puck.y });
+      if (puck.trail.length > 14) puck.trail.shift();
+    } else {
+      stepPhysics();
+    }
+    // Network sync every 2 frames
+    netTick++;
+    if (netTick % 2 === 0 && myRole !== 'ai') sendNetState();
+  }
+  render();
+  rafId = requestAnimationFrame(gameLoop);
+}
 
-  // Table
-  ctx.fillStyle='#FAFAFA'; ctx.fillRect(0,0,CW,CH);
-  ctx.fillStyle='rgba(41,121,255,0.06)'; ctx.fillRect(0,0,CW,CH/2);
-  ctx.fillStyle='rgba(255,71,87,0.06)';  ctx.fillRect(0,CH/2,CW,CH/2);
+// ═══════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════
+function render() {
+  ctx.clearRect(0, 0, CW, CH);
 
-  // Border
-  ctx.save(); ctx.beginPath(); ctx.roundRect(2,2,CW-4,CH-4,14);
-  ctx.strokeStyle='#E5E7EB'; ctx.lineWidth=4; ctx.stroke(); ctx.restore();
+  // Table BG
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(0, 0, CW, CH);
 
-  // Center
-  const cR=Math.min(CW,CH)*0.14;
-  ctx.beginPath(); ctx.arc(CW/2,CH/2,cR,0,Math.PI*2);
-  ctx.strokeStyle='#E0E0E0'; ctx.lineWidth=3; ctx.stroke();
-  ctx.beginPath(); ctx.arc(CW/2,CH/2,6,0,Math.PI*2);
-  ctx.fillStyle='#E0E0E0'; ctx.fill();
-  ctx.save(); ctx.setLineDash([14,9]);
-  ctx.strokeStyle='#E0E0E0'; ctx.lineWidth=3;
-  ctx.beginPath(); ctx.moveTo(0,CH/2); ctx.lineTo(CW,CH/2); ctx.stroke();
+  // Half tints
+  ctx.fillStyle = 'rgba(41,121,255,0.055)';
+  ctx.fillRect(0, 0, CW, CH / 2);
+  ctx.fillStyle = 'rgba(255,71,87,0.055)';
+  ctx.fillRect(0, CH / 2, CW, CH / 2);
+
+  // Center line
+  ctx.save(); ctx.setLineDash([12, 8]);
+  ctx.strokeStyle = '#E2E8F5'; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(0, CH / 2); ctx.lineTo(CW, CH / 2); ctx.stroke();
   ctx.restore();
 
+  // Center circle
+  const cr = Math.min(CW, CH) * 0.12;
+  ctx.beginPath(); ctx.arc(CW / 2, CH / 2, cr, 0, Math.PI * 2);
+  ctx.strokeStyle = '#E2E8F5'; ctx.lineWidth = 2.5; ctx.stroke();
+  ctx.beginPath(); ctx.arc(CW / 2, CH / 2, 5, 0, Math.PI * 2);
+  ctx.fillStyle = '#E2E8F5'; ctx.fill();
+
   // Goals
-  const gW=CW*GOAL_FR, gL=(CW-gW)/2, gR=gL+gW;
-  // Top
-  ctx.fillStyle='rgba(41,121,255,0.18)';
-  ctx.beginPath(); ctx.roundRect(gL,0,gW,GOAL_H,[0,0,10,10]); ctx.fill();
-  ctx.strokeStyle='#2979FF'; ctx.lineWidth=3;
-  ctx.beginPath(); ctx.moveTo(gL,GOAL_H); ctx.lineTo(gL,0); ctx.lineTo(gR,0); ctx.lineTo(gR,GOAL_H); ctx.stroke();
-  for(const px of [gL,gR]){
-    ctx.beginPath(); ctx.arc(px,GOAL_H,7,0,Math.PI*2);
-    ctx.fillStyle='#2979FF'; ctx.fill();
-    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(px,GOAL_H,3,0,Math.PI*2); ctx.fill();
-  }
-  // Bottom
-  ctx.fillStyle='rgba(255,71,87,0.18)';
-  ctx.beginPath(); ctx.roundRect(gL,CH-GOAL_H,gW,GOAL_H,[10,10,0,0]); ctx.fill();
-  ctx.strokeStyle='#FF4757'; ctx.lineWidth=3;
-  ctx.beginPath(); ctx.moveTo(gL,CH-GOAL_H); ctx.lineTo(gL,CH); ctx.lineTo(gR,CH); ctx.lineTo(gR,CH-GOAL_H); ctx.stroke();
-  for(const px of [gL,gR]){
-    ctx.beginPath(); ctx.arc(px,CH-GOAL_H,7,0,Math.PI*2);
-    ctx.fillStyle='#FF4757'; ctx.fill();
-    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(px,CH-GOAL_H,3,0,Math.PI*2); ctx.fill();
-  }
+  const gW = CW * GOAL_FRAC, gL = (CW - gW) / 2, gR = gL + gW;
+  drawGoal(gL, gR, 0, GOAL_DEPTH, '#2979FF', 'top');
+  drawGoal(gL, gR, CH - GOAL_DEPTH, CH, '#FF4757', 'bottom');
 
   // Puck trail
-  puck.trail.forEach((p,i)=>{
-    const a=i/puck.trail.length;
-    ctx.beginPath(); ctx.arc(p.x,p.y,puck.r*a*0.7,0,Math.PI*2);
-    ctx.fillStyle=`rgba(60,60,60,${a*0.15})`; ctx.fill();
+  puck.trail.forEach((p, i) => {
+    const a = i / puck.trail.length;
+    ctx.beginPath(); ctx.arc(p.x, p.y, puck.r * a * 0.7, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(60,60,80,${a * 0.1})`; ctx.fill();
   });
 
-  // ── PUCK ── (always draw — guest gets position from network)
+  // Puck
   drawPuck();
 
-  // ── PADDLES ──
-  drawPad(pad1,'#FF4757','#FF6B81','#FFE4E8'); // red = local player
-  drawPad(pad2,'#2979FF','#5599FF','#DBEAFE'); // blue = opponent
+  // Paddles
+  drawPaddle(pad1, '#FF4757', '#FFCDD2', '#FF8A80');
+  drawPaddle(pad2, '#2979FF', '#BBDEFB', '#82B1FF');
 }
 
-function drawPuck(){
-  const x=puck.x, y=puck.y, r=puck.r;
-  if(r<=0) return; // safety guard
-
-  // Outer glow ring (speed indicator)
-  const spd=Math.hypot(puck.vx,puck.vy);
-  const maxS=Math.min(CW,CH)*0.024;
-  const glowA=Math.min(spd/maxS, 1)*0.5;
-  if(glowA>0.05){
-    ctx.beginPath(); ctx.arc(x,y,r+4,0,Math.PI*2);
-    ctx.strokeStyle=`rgba(100,180,255,${glowA})`; ctx.lineWidth=3; ctx.stroke();
+function drawGoal(gl, gr, y0, y1, color, side) {
+  ctx.fillStyle = color + '22';
+  ctx.fillRect(gl, y0, gr - gl, y1 - y0);
+  ctx.strokeStyle = color; ctx.lineWidth = 3;
+  ctx.beginPath();
+  if (side === 'top') {
+    ctx.moveTo(gl, y1); ctx.lineTo(gl, y0); ctx.lineTo(gr, y0); ctx.lineTo(gr, y1);
+  } else {
+    ctx.moveTo(gl, y0); ctx.lineTo(gl, y1); ctx.lineTo(gr, y1); ctx.lineTo(gr, y0);
   }
-
-  // Shadow
-  ctx.beginPath(); ctx.arc(x+3,y+5,r,0,Math.PI*2);
-  ctx.fillStyle='rgba(0,0,0,0.18)'; ctx.fill();
-
-  // Body — dark glossy puck
-  const g=ctx.createRadialGradient(x-r*.3,y-r*.3,r*.05,x,y,r);
-  g.addColorStop(0,'#5a5a6a');
-  g.addColorStop(0.4,'#1e1e2e');
-  g.addColorStop(1,'#080810');
-  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
-  ctx.fillStyle=g; ctx.fill();
-
-  // Outer rim
-  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
-  ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.lineWidth=2; ctx.stroke();
-
-  // Inner ring detail
-  ctx.beginPath(); ctx.arc(x,y,r*0.6,0,Math.PI*2);
-  ctx.strokeStyle='rgba(255,255,255,0.07)'; ctx.lineWidth=1.5; ctx.stroke();
-
-  // Top shine
-  ctx.beginPath(); ctx.arc(x-r*.25,y-r*.25,r*.32,0,Math.PI*2);
-  ctx.fillStyle='rgba(255,255,255,0.22)'; ctx.fill();
-
-  // Small center dot
-  ctx.beginPath(); ctx.arc(x,y,r*.1,0,Math.PI*2);
-  ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.fill();
+  ctx.stroke();
+  // Posts
+  for (const px of [gl, gr]) {
+    ctx.beginPath(); ctx.arc(px, side === 'top' ? y1 : y0, 7, 0, Math.PI * 2);
+    ctx.fillStyle = color; ctx.fill();
+    ctx.beginPath(); ctx.arc(px, side === 'top' ? y1 : y0, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff'; ctx.fill();
+  }
 }
 
-function drawPad(pad, main, mid, light){
-  const x=pad.x, y=pad.y, r=pad.r;
-  if(r<=0) return;
-
+function drawPuck() {
+  const { x, y, r } = puck;
   // Shadow
-  ctx.beginPath(); ctx.arc(x+3,y+5,r,0,Math.PI*2);
-  ctx.fillStyle='rgba(0,0,0,0.18)'; ctx.fill();
+  ctx.beginPath(); ctx.arc(x + 3, y + 4, r, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(0,0,0,.14)'; ctx.fill();
+  // Body
+  const g = ctx.createRadialGradient(x - r * .3, y - r * .3, 1, x, y, r);
+  g.addColorStop(0, '#666'); g.addColorStop(.6, '#222'); g.addColorStop(1, '#0a0a0a');
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fillStyle = g; ctx.fill();
+  // Rim
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(255,255,255,.1)'; ctx.lineWidth = 1.5; ctx.stroke();
+  // Shine
+  ctx.beginPath(); ctx.arc(x - r * .28, y - r * .28, r * .28, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.fill();
+}
 
-  // Outer ring (light colored)
-  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
-  ctx.fillStyle=light; ctx.fill();
-
-  // Grip texture ring
-  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
-  ctx.strokeStyle='rgba(0,0,0,0.06)'; ctx.lineWidth=r*0.12;
-  ctx.setLineDash([r*0.2, r*0.15]);
-  ctx.stroke(); ctx.setLineDash([]);
-
-  // Middle ring
-  ctx.beginPath(); ctx.arc(x,y,r*0.72,0,Math.PI*2);
-  ctx.fillStyle=mid; ctx.fill();
-
-  // Core gradient
-  const g=ctx.createRadialGradient(x-r*.22,y-r*.22,r*.05,x,y,r*.5);
-  g.addColorStop(0,mid); g.addColorStop(1,main);
-  ctx.beginPath(); ctx.arc(x,y,r*0.5,0,Math.PI*2);
-  ctx.fillStyle=g; ctx.fill();
-
+function drawPaddle(pad, main, light, mid) {
+  const { x, y, r } = pad;
+  // Shadow
+  ctx.beginPath(); ctx.arc(x + 3, y + 5, r, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(0,0,0,.14)'; ctx.fill();
+  // Outer
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fillStyle = light; ctx.fill();
+  // Mid ring
+  ctx.beginPath(); ctx.arc(x, y, r * .76, 0, Math.PI * 2);
+  ctx.fillStyle = mid; ctx.fill();
+  // Core
+  const g = ctx.createRadialGradient(x - r * .2, y - r * .2, r * .05, x, y, r * .5);
+  g.addColorStop(0, mid); g.addColorStop(1, main);
+  ctx.beginPath(); ctx.arc(x, y, r * .5, 0, Math.PI * 2);
+  ctx.fillStyle = g; ctx.fill();
   // Cross lines
-  ctx.strokeStyle='rgba(255,255,255,0.3)'; ctx.lineWidth=2; ctx.setLineDash([]);
-  for(let i=0;i<4;i++){
-    const a=Math.PI/2*i;
+  ctx.strokeStyle = 'rgba(255,255,255,.3)'; ctx.lineWidth = 2;
+  for (let i = 0; i < 4; i++) {
+    const a = Math.PI / 2 * i;
     ctx.beginPath();
-    ctx.moveTo(x+Math.cos(a)*r*.18, y+Math.sin(a)*r*.18);
-    ctx.lineTo(x+Math.cos(a)*r*.58, y+Math.sin(a)*r*.58);
+    ctx.moveTo(x + Math.cos(a) * r * .18, y + Math.sin(a) * r * .18);
+    ctx.lineTo(x + Math.cos(a) * r * .58, y + Math.sin(a) * r * .58);
     ctx.stroke();
   }
-
-  // Center button
-  ctx.beginPath(); ctx.arc(x,y,r*.18,0,Math.PI*2);
-  ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.fill();
-  ctx.beginPath(); ctx.arc(x,y,r*.10,0,Math.PI*2);
-  ctx.fillStyle=main; ctx.fill();
+  // Centre dot
+  ctx.beginPath(); ctx.arc(x, y, r * .12, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.fill();
 }
 
-// ═══════════════════════════════════════════════════
-// FULLSCREEN / LEAVE
-// ═══════════════════════════════════════════════════
-function toggleFullscreen(){
-  const el=document.getElementById('sGame');
-  if(!document.fullscreenElement){
-    (el.requestFullscreen||el.webkitRequestFullscreen).call(el)
-      .then(()=>setTimeout(resizeCanvas,100))
-      .catch(()=>showToast('⚠️ Fullscreen not available'));
+// ═══════════════════════════════════════════════════════════
+// GAME OVER
+// ═══════════════════════════════════════════════════════════
+function showGameOver() {
+  gameRunning = false;
+  clearInterval(timerInterval);
+  if (myRole === 'host') wsSend({ type: 'game_over', s_guest: score2, s_host: score1 });
+
+  const ov = document.getElementById('gameOver');
+  ov.classList.remove('hidden');
+  const win = score1 > score2;
+  const draw = score1 === score2;
+  document.getElementById('ovEmoji').textContent = draw ? '🤝' : win ? '🏆' : '😅';
+  document.getElementById('ovTitle').textContent  = draw ? "It's a Draw!" : win ? 'You Win!' : 'You Lose!';
+  document.getElementById('ovSub').textContent    = `${score1} – ${score2}`;
+  launchConfetti(); launchConfetti();
+}
+
+function playAgain() {
+  if (myRole === 'ai') { doRestart(); return; }
+  wsSend({ type: 'restart' });
+  toast('🔄 Waiting for opponent…');
+}
+
+function doRestart() {
+  score1 = 0; score2 = 0; updateHUD();
+  document.getElementById('gameOver').classList.add('hidden');
+  resetPuck();
+  startTimer();
+  gameRunning = true;
+}
+
+function leaveGame() {
+  gameRunning = false;
+  clearInterval(timerInterval);
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  if (document.fullscreenElement) document.exitFullscreen();
+  if (document.pointerLockElement) document.exitPointerLock();
+  window.removeEventListener('resize', resizeCanvas);
+  closeWS();
+  show('sLobby');
+}
+
+// ═══════════════════════════════════════════════════════════
+// FULLSCREEN
+// ═══════════════════════════════════════════════════════════
+function toggleFS() {
+  const el = document.getElementById('sGame');
+  if (!document.fullscreenElement) {
+    el.requestFullscreen?.() || el.webkitRequestFullscreen?.();
   } else {
-    document.exitFullscreen();
+    document.exitFullscreen?.();
   }
 }
-document.addEventListener('fullscreenchange',()=>{
-  const btn=document.querySelector('.icon-btn.fs');
-  if(btn) btn.textContent=document.fullscreenElement?'✕':'⛶';
-  setTimeout(resizeCanvas,100);
+document.addEventListener('fullscreenchange', () => {
+  const btn = document.querySelector('.hud-btn.fs');
+  if (btn) btn.textContent = document.fullscreenElement ? '✕' : '⛶';
+  setTimeout(resizeCanvas, 80);
 });
 
-function leaveGame(){
-  gameActive=false; clearInterval(timerInt);
-  if(raf){ cancelAnimationFrame(raf); raf=null; }
-  if(document.fullscreenElement) document.exitFullscreen();
-  if(document.pointerLockElement) document.exitPointerLock();
-  if(ws){ ws.close(); ws=null; }
-  goScreen('sLobby');
+// ═══════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════
+function clamp(v, mn, mx) { return v < mn ? mn : v > mx ? mx : v; }
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove('show'), 2400);
 }
 
-// ═══════════════════════════════════════════════════
-// CONFETTI / PARTICLES / LOADER / TOAST
-// ═══════════════════════════════════════════════════
-function confetti(){
-  const colors=['#FF4757','#2979FF','#FFD600','#00E676','#FF6D00','#F06292','#00B0FF','#FFAB40'];
-  for(let i=0;i<45;i++){
-    const el=document.createElement('div'); el.className='cp';
-    const sz=6+Math.random()*8;
-    el.style.cssText=`left:${Math.random()*100}%;background:${colors[~~(Math.random()*colors.length)]};
-      width:${sz}px;height:${sz}px;border-radius:${Math.random()>.5?'50%':'2px'};
-      animation-duration:${1.5+Math.random()*1.8}s;animation-delay:${Math.random()*.4}s;`;
+function launchConfetti() {
+  const cols = ['#FF4757','#2979FF','#FFD600','#00C853','#FF6D00','#F06292','#00B0FF'];
+  for (let i = 0; i < 44; i++) {
+    const el = document.createElement('div');
+    el.className = 'cf';
+    const sz = 6 + Math.random() * 8;
+    el.style.cssText = `left:${Math.random()*100}%;width:${sz}px;height:${sz}px;` +
+      `background:${cols[~~(Math.random()*cols.length)]};` +
+      `border-radius:${Math.random()>.5?'50%':'3px'};` +
+      `animation-duration:${1.5+Math.random()*1.8}s;animation-delay:${Math.random()*.5}s;`;
     document.body.appendChild(el);
-    setTimeout(()=>el.remove(),3500);
+    setTimeout(() => el.remove(), 3500);
   }
 }
 
-window.addEventListener('load',()=>{
-  setTimeout(()=>{
-    const loader=document.getElementById('loader');
-    loader.classList.add('fade-out');
-    setTimeout(()=>loader.remove(),520);
-    spawnParticles();
-  },1500);
-});
-
-function spawnParticles(){
-  const colors=['#FF4757','#2979FF','#FFD600','#00E676','#FF6D00','#F06292','#06b6d4'];
-  for(let i=0;i<18;i++){
-    const el=document.createElement('div'); el.className='particle';
-    const sz=[6,8,10,12,14][~~(Math.random()*5)];
-    el.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;
-      background:${colors[~~(Math.random()*colors.length)]};
-      animation-duration:${5+Math.random()*8}s;animation-delay:${Math.random()*6}s;`;
+function spawnParticles() {
+  const cols = ['#FF4757','#2979FF','#FFD600','#00C853','#FF6D00'];
+  for (let i = 0; i < 16; i++) {
+    const el = document.createElement('div');
+    el.className = 'fp';
+    const sz = 6 + Math.random() * 10;
+    el.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;` +
+      `background:${cols[~~(Math.random()*cols.length)]};` +
+      `animation-duration:${6+Math.random()*8}s;animation-delay:${Math.random()*6}s;`;
     document.body.appendChild(el);
   }
-}
-
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  clearTimeout(showToast._t);
-  showToast._t=setTimeout(()=>t.classList.remove('show'),2200);
 }
 </script>
 </body>
